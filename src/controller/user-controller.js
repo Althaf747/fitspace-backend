@@ -1,5 +1,4 @@
-import userService from './userService/user-service.js';
-import e from "express";
+import userService from "../service/user-service.js";
 
 const register = async (req, res, next) => {
     try {
@@ -16,7 +15,7 @@ const login = async (req, res, next) => {
     try {
         const result = await userService.login(req.body);
         res.status(200).json({
-            data: result,
+            authorization: result,
         })
     }catch (error) {
         next(error);
@@ -25,8 +24,7 @@ const login = async (req, res, next) => {
 
 const get = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const result = await userService.get(id);
+        const result = await userService.get(req);
         res.status(200).json({
             data: result,
         })
@@ -35,4 +33,41 @@ const get = async (req, res, next) => {
     }
 }
 
-export default {register, login, get};
+const logout = async (req, res, next) => {
+    try {
+        localStorage.removeItem('token');
+        res.status(200).json({
+            message: "logout successfully",
+        })
+    }catch (error) {
+        next(error);
+    }
+}
+
+const changeUsername = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const result = await userService.changeUsername(id, req);
+        res.status(200).json({
+            data: result,
+            message: "OK"
+        })
+    } catch (e) {
+        next(e);
+    }
+}
+
+const changePassword = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const result =  await userService.changePassword(id, req);
+        res.status(200).json({
+            data: result,
+            message : "OK"
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
+export default {register, login, get, logout, changeUsername, changePassword};

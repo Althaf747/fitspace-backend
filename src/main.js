@@ -1,7 +1,6 @@
 
-import {app} from "./application/web.js";
+import {web} from "./application/web.js";
 
-
-app.listen(8080,() =>{
+web.listen(8080,() =>{
     console.log(`Listening on port 8080`);
 });

@@ -17,7 +17,7 @@ datasource db {
 
 // User model
 model User {
-  id                  BigInt    @id @default(autoincrement())
+  id                  Int       @id @default(autoincrement())
   email               String    @unique
   firstName           String    @db.VarChar(100)
   lastName            String?   @db.VarChar(100)
@@ -34,8 +34,8 @@ model User {
 
 // Venue model
 model Venue {
-  id            BigInt   @id @default(autoincrement())
-  ownerId       BigInt
+  id            Int   @id @default(autoincrement())
+  ownerId       Int
   name          String   @db.VarChar(100)
   phoneNumber   String   @db.VarChar(100)
   street        String   @db.VarChar(100)
@@ -54,8 +54,8 @@ model Venue {
 
 // Field model
 model Field {
-  id             BigInt          @id @default(autoincrement())
-  venueId        BigInt
+  id             Int          @id @default(autoincrement())
+  venueId        Int
   price          Float
   type           String          @db.VarChar(100)
   createdAt      DateTime        @default(now())
@@ -69,8 +69,8 @@ model Field {
 
 // Gallery model
 model Gallery {
-  id          BigInt   @id @default(autoincrement())
-  fieldId     BigInt
+  id          Int   @id @default(autoincrement())
+  fieldId     Int
   photoUrl    String   @db.VarChar(100)
   description String?  @db.VarChar(255)
   createdAt   DateTime @default(now())
@@ -80,7 +80,7 @@ model Gallery {
 
 // Schedule model
 model Schedule {
-  id             BigInt          @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   date           DateTime
   timeSlot       String          @db.VarChar(255)
   createdAt      DateTime        @default(now())
@@ -91,9 +91,9 @@ model Schedule {
 
 // Review model
 model Review {
-  id        BigInt   @id @default(autoincrement())
-  fieldId   BigInt
-  userId    BigInt
+  id        Int   @id @default(autoincrement())
+  fieldId   Int
+  userId    Int
   rating    Int
   comment   String?  @db.VarChar(255)
   createdAt DateTime @default(now())
@@ -104,23 +104,23 @@ model Review {
 
 // Booking model
 model Booking {
-  id         BigInt   @id @default(autoincrement())
+  id         Int   @id @default(autoincrement())
   status     String   @db.VarChar(255)
-  customerId BigInt
-  scheduleId BigInt
+  customerId Int
+  scheduleId Int
   createdAt  DateTime @default(now())
   customer   User     @relation(fields: [customerId], references: [id])
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
   Field      Field?   @relation(fields: [fieldId], references: [id])
-  fieldId    BigInt?
+  fieldId    Int?
 }
 
 // FieldSchedule model
 model FieldSchedule {
-  id         BigInt   @id @default(autoincrement())
+  id         Int   @id @default(autoincrement())
   status     String   @default("available")
-  fieldId    BigInt
-  scheduleId BigInt
+  fieldId    Int
+  scheduleId Int
   field      Field    @relation(fields: [fieldId], references: [id])
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
 }

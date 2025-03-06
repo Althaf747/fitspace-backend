@@ -4,6 +4,8 @@ import { ResponseError } from "../error/response-error.js";
 import bcrypt from "bcrypt";
 import 'dotenv/config'
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
+import {loginValidation, registerUserValidation} from "../validation/user-validation.js";
 
 const register = async (req) => {
     const user = validate(registerUserValidation, req);
@@ -23,6 +25,8 @@ const register = async (req) => {
         data: {
             email: user.email,
             password: user.password,
+            firstName : user.firstName,
+            lastName : user.lastName,
         },
         select: {
             email: true,
@@ -47,16 +51,22 @@ const login = async (req) => {
         throw new ResponseError(403, "Password does not match");
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
     return token;
 }
 
-const get = async (id) => {
-    const user = await prismaClient.user.findUnique({ where: { id: id } });
+const get = async (req) => {
+    const user = await prismaClient.user.findUnique({ where: { id: req.user.id }, select: {
+            email: true,
+            firstName: true,
+            lastName: true,
+        } });
+
     if (!user) {
         throw new ResponseError(403, "User does not exist");
     }
+
     return user;
 }
 
@@ -128,5 +138,77 @@ const forgotPassword = async (request) => {
         }
     });
 
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
+        },
+    });
 
-export default { register, login, get, changePassword, changeUsername };
+    const mailOptions = {
+        from: '"Listify" <process.end.EMAIL>',
+        to: email,
+        subject: 'Your OTP for Password Reset',
+        text: `Your OTP for resetting the password is ${otp}. It is valid for 1 minutes.`,
+        html: `<p>Your OTP for resetting the password is <b>${otp}</b>. It is valid for 1 minutes.</p>`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('OTP email sent successfully');
+    } catch (error) {
+        console.error('Error sending OTP email:', error);
+        throw new ResponseError(500, "Failed to send OTP email");
+    }
+
+}
+
+const validateOtp = async (request) => {
+    const otp = request.body.otp;
+    const user = await prismaClient.user.findUnique({
+        where:{
+            otp : otp
+        }
+    })
+
+    if(!user) {
+        throw new ResponseError(403, "Otp Incorrect");
+    }
+}
+
+const resetPassword = async (request) => {
+    const newPassword = request.newPassword
+    const confirmPassword = request.confirmPassword
+    const email = request.email;
+
+    if (!newPassword || !confirmPassword || !email) {
+        throw new ResponseError(400, "Invalid input");
+    }
+
+    if (newPassword !== confirmPassword) {
+        throw new ResponseError(400, "Passwords do not match");
+    }
+
+
+    try {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        return  prismaClient.user.update({
+            where: {
+                email: email,
+            },
+            data: {
+                password: hashedPassword
+            },select : {
+                id : true,
+                username: true,
+            }
+        });
+    } catch (error) {
+        throw new ResponseError(500, "Failed to reset password");
+    }
+}
+
+export default { register, login, get, changePassword, changeUsername , forgotPassword, validateOtp, resetPassword};

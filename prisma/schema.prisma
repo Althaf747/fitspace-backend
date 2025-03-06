@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// schema.prisma
+
+// User model
+model User {
+  id                  BigInt    @id @default(autoincrement())
+  email               String    @unique
+  firstName           String    @db.VarChar(100)
+  lastName            String?   @db.VarChar(100)
+  password            String    @db.VarChar(100)
+  role                String    @default("user")
+  otp                 String?   @unique
+  otpExpiredAt        DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now()) @updatedAt
+  venues              Venue[]
+  reviews             Review[]
+  bookings            Booking[]
+}
+
+// Venue model
+model Venue {
+  id            BigInt   @id @default(autoincrement())
+  ownerId       BigInt
+  name          String   @db.VarChar(100)
+  phoneNumber   String   @db.VarChar(100)
+  street        String   @db.VarChar(100)
+  district      String   @db.VarChar(100)
+  cityOrRegency String   @db.VarChar(100)
+  province      String   @db.VarChar(100)
+  postalCode    String   @db.VarChar(100)
+  latitude      Float
+  longitude     Float
+  rating        Float    @default(0.0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  owner         User     @relation(fields: [ownerId], references: [id])
+  fields        Field[]
+}
+
+// Field model
+model Field {
+  id             BigInt          @id @default(autoincrement())
+  venueId        BigInt
+  price          Float
+  type           String          @db.VarChar(100)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @default(now()) @updatedAt
+  venue          Venue           @relation(fields: [venueId], references: [id])
+  gallery        Gallery[]
+  reviews        Review[]
+  bookings       Booking[]
+  fieldSchedules FieldSchedule[]
+}
+
+// Gallery model
+model Gallery {
+  id          BigInt   @id @default(autoincrement())
+  fieldId     BigInt
+  photoUrl    String   @db.VarChar(100)
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  field       Field    @relation(fields: [fieldId], references: [id])
+}
+
+// Schedule model
+model Schedule {
+  id             BigInt          @id @default(autoincrement())
+  date           DateTime
+  timeSlot       String          @db.VarChar(255)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @default(now()) @updatedAt
+  bookings       Booking[]
+  fieldSchedules FieldSchedule[]
+}
+
+// Review model
+model Review {
+  id        BigInt   @id @default(autoincrement())
+  fieldId   BigInt
+  userId    BigInt
+  rating    Int
+  comment   String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  field     Field    @relation(fields: [fieldId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// Booking model
+model Booking {
+  id         BigInt   @id @default(autoincrement())
+  status     String   @db.VarChar(255)
+  customerId BigInt
+  scheduleId BigInt
+  createdAt  DateTime @default(now())
+  customer   User     @relation(fields: [customerId], references: [id])
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  Field      Field?   @relation(fields: [fieldId], references: [id])
+  fieldId    BigInt?
+}
+
+// FieldSchedule model
+model FieldSchedule {
+  id         BigInt   @id @default(autoincrement())
+  status     String   @default("available")
+  fieldId    BigInt
+  scheduleId BigInt
+  field      Field    @relation(fields: [fieldId], references: [id])
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+}

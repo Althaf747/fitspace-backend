@@ -1,6 +1,6 @@
-import { validate } from "../validation/validation.js";
-import { prismaClient } from "../application/database.js";
-import { ResponseError } from "../error/response-error.js";
+import {validate} from "../validation/validation.js";
+import {prismaClient} from "../application/database.js";
+import {ResponseError} from "../error/response-error.js";
 import bcrypt from "bcrypt";
 import 'dotenv/config'
 import jwt from "jsonwebtoken";
@@ -81,8 +81,12 @@ const changeUsername = async (id, req) => {
             id: id,
         },
         data :{
-          firstName : req.firstName,
-          lastName : req.lastName,
+          firstName : req.body.firstName,
+          lastName : req.body.lastName,
+        },select : {
+            email: true,
+            firstName : true,
+            lastName : true,
         }
     })
 }
@@ -93,16 +97,19 @@ const changePassword = async (id, req) => {
         throw new ResponseError(403, "User does not exist");
     }
 
-    if (req.password !== req.confirmPassword) {
+    if (req.body.password !== req.body.confirmPassword) {
         throw new ResponseError(403, "Password does not match");
     }
 
-    const hashedPassword = await bcrypt.hash(req.password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
     return prismaClient.user.update({
         where: {
             id: id,
         },data : {
             password: hashedPassword,
+        },select : {
+            email: true,
         }
     })
 }
@@ -210,5 +217,6 @@ const resetPassword = async (request) => {
         throw new ResponseError(500, "Failed to reset password");
     }
 }
+
 
 export default { register, login, get, changePassword, changeUsername , forgotPassword, validateOtp, resetPassword};

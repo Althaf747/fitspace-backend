@@ -1,13 +1,21 @@
 import express from "express";
 import userController from "../controller/user-controller.js";
 import {authMiddleware} from "../middleware/auth-middleware.js";
+import {publicRouter} from "./public-api.js";
+import venueController from "../controller/venue-controller.js";
 
-const userRouter = new express.Router();
-userRouter.use(authMiddleware);
+const protectedRouter = new express.Router();
+protectedRouter.use(authMiddleware);
 
-userRouter.get('/api/users/current', userController.get);
-userRouter.delete('/api/users/logout', userController.logout);
-userRouter.patch('/api/users/current/:id', userController.changePassword);
-userRouter.patch('/api/users/current/:id', userController.changeUsername);
+// User Route
+protectedRouter.get('/api/users/current', userController.get);
+protectedRouter.delete('/api/users/logout', userController.logout);
+protectedRouter.patch('/api/users/changePassword/:id', userController.changePassword);
+protectedRouter.patch('/api/users/changeUsername/:id', userController.changeUsername);
 
-export {userRouter}
+// Venue Route
+protectedRouter.post('/api/users/createVenue', venueController.createVenue);
+protectedRouter.get('/api/venues/:id', venueController.get);
+protectedRouter.patch('/api/venues/update/:id', venueController.update);
+
+export {protectedRouter}

@@ -35,7 +35,6 @@ const get = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        localStorage.removeItem('token');
         res.status(200).json({
             message: "logout successfully",
         })
@@ -46,7 +45,8 @@ const logout = async (req, res, next) => {
 
 const changeUsername = async (req, res, next) => {
     try {
-        const id = req.params.id;
+        const id = parseInt(req.params.id);
+        console.log(req);
         const result = await userService.changeUsername(id, req);
         res.status(200).json({
             data: result,
@@ -59,7 +59,7 @@ const changeUsername = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
     try {
-        const id = req.params.id;
+        const id = parseInt(req.params.id);
         const result =  await userService.changePassword(id, req);
         res.status(200).json({
             data: result,

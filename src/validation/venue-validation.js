@@ -22,5 +22,6 @@ const updateValidation = Joi.object({
     postalCode: Joi.string().max(100),
     latitude: Joi.number(),
     longitude: Joi.number(),
+    rating : Joi.number(),
 })
 export { createValidation,updateValidation }

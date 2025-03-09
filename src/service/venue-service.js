@@ -35,14 +35,22 @@ const get = async (id) => {
 }
 
 const update = async (id,req) => {
-    const data = validate(updateValidation,req);
+    const data = validate(updateValidation,req.body);
     const venue = await prismaClient.venue.findUnique({
         where: {
             id: id,
         }
     })
+    console.log(req.user.id)
+    console.log(venue.ownerId);
     if (!venue) {
         throw new ResponseError(403, "venue not found.");
+    }
+
+    if(req.user.id !== venue.ownerId) {
+        if ( req.user.role !== "admin" ) {
+            throw new ResponseError(403, "access denied for this user.");
+        }
     }
 
     return prismaClient.venue.update({
@@ -52,4 +60,38 @@ const update = async (id,req) => {
     })
 }
 
-export default { create ,get , update}
+const deleteVenue = async (id,req) => {
+    const venue = await prismaClient.venue.findUnique({
+        where: {
+            id: id,
+        }
+    })
+
+    if (!venue) {
+        throw new ResponseError(403, "venue not found.");
+    }
+
+    if(req.user.id !== venue.ownerId) {
+        if ( req.user.role !== "admin" ) {
+            throw new ResponseError(403, "access denied for this user.");
+        }
+    }
+
+    return prismaClient.venue.delete({
+        where: {
+            id: id,
+        }
+    })
+
+}
+
+const getAllVenue = async (req) => {
+    const venues = await prismaClient.venue.findMany()
+    if (!venues) {
+        throw new ResponseError(403, "venue not found.");
+    }
+    return venues;
+}
+
+
+export default { create ,get , update, deleteVenue, getAllVenue };

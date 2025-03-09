@@ -4,6 +4,7 @@ import {authMiddleware} from "../middleware/auth-middleware.js";
 import venueController from "../controller/venue-controller.js";
 import fieldController from "../controller/field-controller.js";
 import upload from "../middleware/upload-middleware.js";
+import reviewController from "../controller/review-controller.js";
 
 const protectedRouter = new express.Router();
 protectedRouter.use(authMiddleware);
@@ -21,12 +22,18 @@ protectedRouter.get('/api/venues', venueController.getAllVenues);
 protectedRouter.patch('/api/venues/update/:id', venueController.update);
 protectedRouter.delete('/api/venues/delete/:id', venueController.deleteVenue);
 
-
 // Field Route
 protectedRouter.post('/api/:venueId/fields/create',upload.array("files") ,fieldController.create);
 protectedRouter.get('/api/venues/fields/:id',fieldController.get);
 protectedRouter.get('/api/:venueId/fields',fieldController.getAll);
 protectedRouter.patch('/api/:venueId/fields/:fieldId/update', upload.array("files"), fieldController.updateField);
 protectedRouter.delete('/api/:venueId/fields/:fieldId/delete',fieldController.deleteField);
+
+// Review Route
+protectedRouter.post('/api/:venueId/fields/:fieldId/addReview',reviewController.create)
+protectedRouter.get('/api/:fieldId/reviews', reviewController.getReviewsByFieldId);
+protectedRouter.get('/api/reviews', reviewController.getAllReviews);
+protectedRouter.patch('/api/reviews/:reviewId/update', reviewController.update);
+protectedRouter.delete('/api/reviews/:reviewId/delete',reviewController.deleteReview);
 
 export {protectedRouter}

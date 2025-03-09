@@ -58,6 +58,7 @@ const login = async (req) => {
 
 const get = async (req) => {
     const user = await prismaClient.user.findUnique({ where: { id: req.user.id }, select: {
+            id : true,
             email: true,
             firstName: true,
             lastName: true,
@@ -84,6 +85,7 @@ const changeUsername = async (id, req) => {
           firstName : req.body.firstName,
           lastName : req.body.lastName,
         },select : {
+            id :true,
             email: true,
             firstName : true,
             lastName : true,

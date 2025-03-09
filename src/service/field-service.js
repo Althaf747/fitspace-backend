@@ -1,7 +1,6 @@
-import { validate } from "../validation/validation.js";
+
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
-import {createValidation} from "../validation/field-validation.js";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import path from "path";
@@ -89,7 +88,6 @@ const create = async (venueId,files,req) => {
         }
     });
 
-    console.log("ok")
     if (files.length !== 0) {
             gallery = await Promise.all(files.map(async (file) => {
             const fileName = saveFileLocally(file);
@@ -102,7 +100,6 @@ const create = async (venueId,files,req) => {
         }));
     }
 
-    console.log("ok")
     let schedulesThisWeek = await prismaClient.schedule.findMany({
         where: {
             date: {
@@ -140,20 +137,30 @@ const create = async (venueId,files,req) => {
 
 const get = async (id, req) => {
     const field = await prismaClient.field.findUnique({
-        where: {
-            id: id
-        },select :{
-            id :true,
+        where: { id },
+        select: {
+            id: true,
             venueId: true,
             price: true,
             type: true,
+            fieldSchedules: {  // Include schedules
+                select: {
+                    schedule: {
+                        select: {
+                            id: true,
+                            date: true,
+                            timeSlot: true
+                        }
+                    }
+                }
+            }
         }
     })
     if (!field) {
         throw new ResponseError(404,'field not found');
     }
 
-    return field;
+    return field
 }
 
 const getAll = async (venueId) => {
@@ -166,13 +173,23 @@ const getAll = async (venueId) => {
         throw new ResponseError(404,'venue not found');
     }
     return prismaClient.field.findMany({
-        where: {
-            venueId : venueId
-        },select :{
+        where: { venueId : venueId },
+        select: {
             id: true,
             venueId: true,
             price: true,
             type: true,
+            fieldSchedules: {  // Include schedules
+                select: {
+                    schedule: {
+                        select: {
+                            id: true,
+                            date: true,
+                            timeSlot: true
+                        }
+                    }
+                }
+            }
         }
     })
 }

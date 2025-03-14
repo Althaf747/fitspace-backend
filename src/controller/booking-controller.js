@@ -35,4 +35,17 @@ const update = async (req,res,next) => {
     }
 }
 
-export default {create, getAll, update}
+const deleteBooking = async (req,res,next) => {
+    try {
+        const bookingId = parseInt(req.params.bookingId);
+        await bookingService.deleteBooking(req,bookingId);
+        res.status(200).json({
+            message: "Booking deleted successfully",
+        })
+    }catch(e){
+        next(e)
+    }
+
+}
+
+export default {create, getAll, update, deleteBooking}

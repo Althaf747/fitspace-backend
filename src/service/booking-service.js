@@ -133,6 +133,12 @@ const update = async (req, bookingId) => {
         throw new ResponseError(404, "booking not found");
     }
 
+    if(user.id !== review.userId) {
+        if ( req.user.role !== "admin" ) {
+            throw new ResponseError(403, "access denied for this user.");
+        }
+    }
+
     await prismaClient.booking.update({
         where: {
             id: bookingId,
@@ -161,4 +167,45 @@ const update = async (req, bookingId) => {
 
 }}
 
-export default {create, getAll, update};
+const deleteBooking = async (req, bookingId) => {
+    const user = req.user;
+
+    const booking = await prismaClient.booking.findUnique({
+        where: {
+            id: bookingId,
+        }
+    })
+
+    if (!booking) {
+        throw new ResponseError(404, "booking not found");
+    }
+
+    if(user.id !== review.userId) {
+        if ( req.user.role !== "admin" ) {
+            throw new ResponseError(403, "access denied for this user.");
+        }
+    }
+
+    const fs = await prismaClient.fieldSchedule.findFirst({
+        where: {
+            fieldId : booking.fieldId,
+            scheduleId : booking.scheduleId
+        }
+    })
+
+    await prismaClient.fieldSchedule.update({
+        where: {
+            id : fs.id
+        },data : {
+            status : "Available",
+        }
+    })
+
+    await prismaClient.booking.delete({
+        where: {
+            id: bookingId,
+        }
+    })
+}
+
+export default {create, getAll, update, deleteBooking};

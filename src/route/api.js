@@ -41,5 +41,6 @@ protectedRouter.delete('/api/reviews/:reviewId/delete',reviewController.deleteRe
 protectedRouter.post('/api/:venueId/bookings/create',bookingController.create);
 protectedRouter.get('/api/user/bookings/all', bookingController.getAll);
 protectedRouter.patch('/api/bookings/:bookingId/update', bookingController.update);
+protectedRouter.delete('/api/bookings/:bookingId/delete', bookingController.deleteBooking);
 
 export {protectedRouter}

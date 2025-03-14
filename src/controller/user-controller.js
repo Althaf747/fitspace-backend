@@ -70,4 +70,39 @@ const changePassword = async (req, res, next) => {
     }
 }
 
-export default {register, login, get, logout, changeUsername, changePassword};
+const forgotPassword = async (req, res, next) => {
+    try {
+        const result = await userService.forgotPassword(req.body);
+        res.status(200).json({
+            data: result,
+            message : "OTP has been sent"
+        });
+    }catch (e){
+        next(e);
+    }
+}
+
+const resetPassword = async (req, res, next) => {
+    try {
+        const result = await userService.resetPassword(req.body);
+        res.status(200).json({
+            data: result,
+            message : "Reset Successfully"
+        });
+    }catch (e){
+        next(e);
+    }
+}
+
+const validateOtp = async (req, res, next) => {
+    try{
+        await userService.validateOtp(req)
+        res.status(200).json({
+            message: "OTP Is valid",
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
+export default {register, login, get, logout, changeUsername, changePassword, forgotPassword, resetPassword, validateOtp};

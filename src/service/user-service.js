@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import 'dotenv/config'
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import {loginValidation, registerUserValidation} from "../validation/user-validation.js";
+import {emailValidation, loginValidation, registerUserValidation} from "../validation/user-validation.js";
 
 const register = async (req) => {
     const user = validate(registerUserValidation, req);
@@ -143,7 +143,7 @@ const forgotPassword = async (request) => {
         },
         data: {
             otp: otp,
-            // otpExpire: otpExpire,
+            otpExpire: otpExpire,
         }
     });
 

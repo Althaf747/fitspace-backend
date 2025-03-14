@@ -23,7 +23,7 @@ model User {
   lastName            String?   @db.VarChar(100)
   password            String    @db.VarChar(100)
   role                String    @default("user")
-  otp                 String?   @unique
+  otp                 Int?   @unique
   otpExpiredAt        DateTime?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @default(now()) @updatedAt

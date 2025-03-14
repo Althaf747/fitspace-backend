@@ -143,7 +143,7 @@ const forgotPassword = async (request) => {
         },
         data: {
             otp: otp,
-            otpExpire: otpExpire,
+            otpExpiredAt: otpExpire,
         }
     });
 

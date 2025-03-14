@@ -5,6 +5,7 @@ import venueController from "../controller/venue-controller.js";
 import fieldController from "../controller/field-controller.js";
 import upload from "../middleware/upload-middleware.js";
 import reviewController from "../controller/review-controller.js";
+import bookingController from "../controller/booking-controller.js";
 
 const protectedRouter = new express.Router();
 protectedRouter.use(authMiddleware);
@@ -35,5 +36,10 @@ protectedRouter.get('/api/:fieldId/reviews', reviewController.getReviewsByFieldI
 protectedRouter.get('/api/reviews', reviewController.getAllReviews);
 protectedRouter.patch('/api/reviews/:reviewId/update', reviewController.update);
 protectedRouter.delete('/api/reviews/:reviewId/delete',reviewController.deleteReview);
+
+// Booking Route
+protectedRouter.post('/api/:venueId/bookings/create',bookingController.create);
+protectedRouter.get('/api/user/bookings/all', bookingController.getAll);
+protectedRouter.patch('/api/bookings/:bookingId/update', bookingController.update);
 
 export {protectedRouter}

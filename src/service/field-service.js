@@ -29,7 +29,7 @@ const saveFileLocally = (file) => {
 const createScheduleIfNotExist = async () => {
     const today = new Date();
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Set to Monday
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1);
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
@@ -93,7 +93,7 @@ const create = async (venueId,files,req) => {
             const fileName = saveFileLocally(file);
             return prismaClient.gallery.create({
                 data: {
-                    galleryUrl: `/uploads/${fileName}`,
+                    photoUrl: `/uploads/${fileName}`,
                     fieldId: field.id
                 }
             });
@@ -103,7 +103,7 @@ const create = async (venueId,files,req) => {
     let schedulesThisWeek = await prismaClient.schedule.findMany({
         where: {
             date: {
-                gte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 1)),
+                gte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay())),
                 lte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 7))
             }
         }
@@ -114,12 +114,14 @@ const create = async (venueId,files,req) => {
         schedulesThisWeek = await prismaClient.schedule.findMany({
             where: {
                 date: {
-                    gte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 1)),
+                    gte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay())),
                     lte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 7))
                 }
             }
         });
     }
+
+    console.log(schedulesThisWeek);
 
     const fieldSchedules = await Promise.all(schedulesThisWeek.map(schedule =>
         prismaClient.fieldSchedule.create({
@@ -145,6 +147,7 @@ const get = async (id, req) => {
             type: true,
             fieldSchedules: {  // Include schedules
                 select: {
+                    status: true,
                     schedule: {
                         select: {
                             id: true,
@@ -179,8 +182,9 @@ const getAll = async (venueId) => {
             venueId: true,
             price: true,
             type: true,
-            fieldSchedules: {  // Include schedules
+            fieldSchedules: {
                 select: {
+                    status: true,
                     schedule: {
                         select: {
                             id: true,

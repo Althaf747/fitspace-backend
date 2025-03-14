@@ -81,7 +81,7 @@ model Gallery {
 // Schedule model
 model Schedule {
   id             Int          @id @default(autoincrement())
-  date           DateTime
+  date           DateTime     @db.Date
   timeSlot       String          @db.VarChar(255)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @default(now()) @updatedAt
@@ -111,7 +111,7 @@ model Booking {
   createdAt  DateTime @default(now())
   customer   User     @relation(fields: [customerId], references: [id])
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  Field      Field?   @relation(fields: [fieldId], references: [id])
+  field      Field?   @relation(fields: [fieldId], references: [id])
   fieldId    Int?
 }
 

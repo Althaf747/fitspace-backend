@@ -1,8 +1,7 @@
-
-import { prismaClient } from "../application/database.js";
-import { ResponseError } from "../error/response-error.js";
+import {prismaClient} from "../application/database.js";
+import {ResponseError} from "../error/response-error.js";
 import fs from "fs";
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -137,7 +136,7 @@ const create = async (venueId,files,req) => {
 
 }
 
-const get = async (id, req) => {
+const get = async (id) => {
     const field = await prismaClient.field.findUnique({
         where: { id },
         select: {
@@ -199,6 +198,7 @@ const getAll = async (venueId) => {
 }
 
 const updateField = async (req,files, venueId, fieldId) => {
+    const removedFiles = req.body.removedFiles;
     const user = req.user;
     const venue = await prismaClient.venue.findUnique({ where: {
         id: venueId }
@@ -229,18 +229,54 @@ const updateField = async (req,files, venueId, fieldId) => {
         });
     }
 
-    // kode buat hapus poto
+
+    if (removedFiles.length > 0) {
+        const deleteFilePromises = removedFiles.map(async (file) => {
+            const filePath = path.join(__dirname, '../uploads', path.basename(file)); // Assuming uploads directory and filename
+            const photo = await prismaClient.gallery.findFirst({
+                where: {
+                    photoUrl: file
+                }
+            })
+
+            console.log(file);
+            console.log(removedFiles)
+            console.log("/uploads/1742781345914-Screenshot 2025-03-02 093651.png")
+            console.log(photo)
+
+            const deleteFromDbPromise = prismaClient.gallery.delete({
+                where: {
+                    id: photo.id,
+                },
+            });
+
+            const deleteFromLocalPromise = new Promise((resolve, reject) => {
+                fs.unlink(filePath, (err) => {
+                    if (err) {
+                        console.error('Error deleting file from local storage:', err);
+                        reject(err);
+                    } else {
+                        console.log('File deleted from local storage:', filePath);
+                        resolve();
+                    }
+                });
+            });
+
+            return Promise.all([deleteFromDbPromise, deleteFromLocalPromise]);
+        });
+
+        await Promise.all(deleteFilePromises);
+    }
 
     if (files && files.length > 0) {
-        const newgallerys = await Promise.all(files.map(async (file) => {
+        await Promise.all(files.map(async (file) => {
             const fileName = saveFileLocally(file);
-            const gallery = await prismaClient.gallery.create({
+            return  prismaClient.gallery.create({
                 data: {
                     photoUrl: `/uploads/${fileName}`,
                     fieldId: field.id
                 }
             });
-            return gallery;
         }));
     }
 

@@ -17,7 +17,7 @@ protectedRouter.patch('/api/users/changePassword/:id', userController.changePass
 protectedRouter.patch('/api/users/changeUsername/:id', userController.changeUsername);
 
 // Venue Route
-protectedRouter.post('/api/users/createVenue', venueController.createVenue);
+protectedRouter.post('/api/venues/createVenue', venueController.createVenue);
 protectedRouter.get('/api/venues/:id', venueController.get);
 protectedRouter.get('/api/venues', venueController.getAllVenues);
 protectedRouter.patch('/api/venues/update/:id', venueController.update);

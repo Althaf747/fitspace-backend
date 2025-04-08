@@ -29,6 +29,7 @@ const register = async (req) => {
             lastName : user.lastName,
         },
         select: {
+            id : true,
             email: true,
         }
     });
@@ -44,11 +45,11 @@ const login = async (req) => {
     });
 
     if (!user) {
-        throw new ResponseError(403, "Email or password is incorrect");
+        throw new ResponseError(401, "Email or password is incorrect");
     }
 
     if (!await bcrypt.compare(request.password, user.password)) {
-        throw new ResponseError(403, "Password does not match");
+        throw new ResponseError(401, "Password does not match");
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });

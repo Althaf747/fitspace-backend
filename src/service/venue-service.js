@@ -85,8 +85,28 @@ const deleteVenue = async (id,req) => {
 
 }
 
-const getAllVenue = async (req) => {
-    const venues = await prismaClient.venue.findMany()
+const getAllVenue = async () => {
+    const venues = await prismaClient.venue.findMany({
+        select: {
+            id: true,
+            name : true,
+            phoneNumber: true,
+            street: true,
+            district: true,
+            cityOrRegency: true,
+            province: true,
+            postalCode: true,
+            latitude: true,
+            longitude: true,
+            rating: true,
+            fields : {
+                select : {
+                    type : true,
+                    price : true,
+                }
+            }
+        }
+    })
     if (!venues) {
         throw new ResponseError(403, "venue not found.");
     }

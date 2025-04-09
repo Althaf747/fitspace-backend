@@ -99,8 +99,16 @@ const getAllVenue = async () => {
             latitude: true,
             longitude: true,
             rating: true,
+            owner : {
+                select :{
+                    firstName : true,
+                    lastName : true,
+                    createdAt : true,
+                }
+            },
             fields : {
                 select : {
+                    id: true,
                     type : true,
                     price : true,
                 }

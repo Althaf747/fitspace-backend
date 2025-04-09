@@ -151,7 +151,8 @@ const get = async (id) => {
                         select: {
                             id: true,
                             date: true,
-                            timeSlot: true
+                            timeSlot: true,
+
                         }
                     }
                 }
@@ -188,9 +189,15 @@ const getAll = async (venueId) => {
                         select: {
                             id: true,
                             date: true,
-                            timeSlot: true
+                            timeSlot: true,
+
                         }
                     }
+                }
+            },
+            reviews : {
+                select: {
+                    id: true,
                 }
             }
         }

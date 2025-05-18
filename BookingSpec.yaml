@@ -1,0 +1,236 @@
+openapi: 3.0.0
+info:
+  title: Booking API
+  version: 1.0.0
+  description: Booking service API untuk mengelola pemesanan lapangan
+servers:
+  - url: https://api.example.com
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/{venueId}/bookings/create:
+    post:
+      summary: Create Booking
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Venue tempat booking dibuat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '200':
+          description: Booking berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Booking'
+        '400':
+          description: Validasi gagal atau data tidak lengkap
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/user/bookings/all:
+    get:
+      summary: Get All Bookings Pengguna
+      responses:
+        '200':
+          description: Daftar semua booking milik user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookingListItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/bookings/{bookingId}/update:
+    patch:
+      summary: Update Booking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookingRequest'
+      responses:
+        '200':
+          description: Booking berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Booking updated successfully
+        '400':
+          description: Validasi gagal atau data tidak valid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/bookings/{bookingId}/delete:
+    delete:
+      summary: Delete Booking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Booking
+      responses:
+        '200':
+          description: Booking berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Booking deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT dikirim di header Authorization sebagai `Bearer {token}`
+
+  schemas:
+    CreateBookingRequest:
+      type: object
+      required:
+        - type
+        - date
+        - timeSlot
+      properties:
+        type:
+          type: string
+          description: Tipe lapangan yang dipesan
+        date:
+          type: string
+          format: date
+          description: Tanggal booking (YYYY-MM-DD)
+        timeSlot:
+          type: string
+          description: Slot waktu booking (misal':' "09:00-10:00")
+
+    UpdateBookingRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Status booking baru (e.g., "cancelled", "finished", "on going")
+
+    ScheduleSummary:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        timeSlot:
+          type: string
+
+    ScheduleDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        timeSlot:
+          type: string
+
+    CustomerSummary:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    FieldSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        customerId:
+          type: integer
+        fieldId:
+          type: integer
+        schedule:
+          $ref: '#/components/schemas/ScheduleSummary'
+
+    BookingListItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        customer:
+          $ref: '#/components/schemas/CustomerSummary'
+        field:
+          $ref: '#/components/schemas/FieldSummary'
+        schedule:
+          $ref: '#/components/schemas/ScheduleDetail'
+
+  responses:
+    Unauthorized:
+      description: Autentikasi gagal, token tidak valid atau tidak diberikan
+    Forbidden:
+      description: Akses ditolak, token valid tapi tidak punya hak akses
+    NotFound:
+      description: Resource tidak ditemukan

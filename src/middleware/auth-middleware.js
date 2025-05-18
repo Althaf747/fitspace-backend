@@ -26,10 +26,6 @@ export const authMiddleware = async (req, res, next) => {
             });
         }
 
-        const newToken = jwt.sign({ userId: decoded.userId }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-
-        res.setHeader('Authorization', `Bearer ${newToken}`);
-
         req.user = user;
         next();
     } catch (error) {

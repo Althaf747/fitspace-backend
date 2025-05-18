@@ -1,0 +1,329 @@
+openapi: 3.0.0
+info:
+  title: Field API
+  version: 1.0.0
+  description: Field service API untuk mengelola lapangan di dalam venue
+servers:
+  - url: https://api.example.com
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/{venueId}/fields/create:
+    post:
+      summary: Create Field
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Venue tempat field akan dibuat
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - price
+                - type
+              properties:
+                price:
+                  type: integer
+                  description: Harga sewa field
+                type:
+                  type: string
+                  description: Tipe lapangan (misal':' "futsal", "basket")
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Foto-foto lapangan
+      responses:
+        '202':
+          description: Field berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      field:
+                        $ref: '#/components/schemas/Field'
+                      gallery:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Gallery'
+                      fieldSchedules:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/FieldSchedule'
+        '400':
+          description: Validasi gagal atau data tidak lengkap
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/venues/fields/{id}:
+    get:
+      summary: Get Field by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Field
+      responses:
+        '200':
+          description: Data field berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FieldDetail'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/{venueId}/fields:
+    get:
+      summary: Get All Fields for a Venue
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Venue
+      responses:
+        '200':
+          description: Daftar field pada venue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FieldListItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/{venueId}/fields/{fieldId}/update:
+    patch:
+      summary: Update Field
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Venue
+        - name: fieldId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Field
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: integer
+                  description: Harga baru (opsional)
+                type:
+                  type: string
+                  description: Tipe baru (opsional)
+                removedFiles:
+                  type: array
+                  items:
+                    type: string
+                  description: URL file yang akan dihapus dari gallery
+                fieldSchedules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FieldScheduleUpdate'
+                  description: Daftar pembaruan status jadwal (opsional)
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Foto baru untuk ditambahkan (opsional)
+      responses:
+        '200':
+          description: Field berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Field'
+        '400':
+          description: Validasi gagal atau data tidak valid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/{venueId}/fields/{fieldId}/delete:
+    delete:
+      summary: Delete Field
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Venue
+        - name: fieldId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Field
+      responses:
+        '200':
+          description: Field berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: field deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT dikirim di header Authorization sebagai `Bearer {token}`
+
+  schemas:
+    Field:
+      type: object
+      properties:
+        id:
+          type: integer
+        venueId:
+          type: integer
+        price:
+          type: number
+        type:
+          type: string
+
+    Gallery:
+      type: object
+      properties:
+        id:
+          type: integer
+        photoUrl:
+          type: string
+        fieldId:
+          type: integer
+
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        timeSlot:
+          type: string
+
+    FieldSchedule:
+      type: object
+      properties:
+        id:
+          type: integer
+        fieldId:
+          type: integer
+        scheduleId:
+          type: integer
+        status:
+          type: string
+
+    FieldScheduleDetail:
+      type: object
+      properties:
+        status:
+          type: string
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+
+    FieldScheduleUpdate:
+      type: object
+      properties:
+        scheduleId:
+          type: integer
+        status:
+          type: string
+
+    FieldDetail:
+      allOf:
+        - $ref: '#/components/schemas/Field'
+        - type: object
+          properties:
+            fieldSchedules:
+              type: array
+              items:
+                $ref: '#/components/schemas/FieldScheduleDetail'
+
+    ReviewSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        rating:
+          type: number
+
+    FieldListItem:
+      allOf:
+        - $ref: '#/components/schemas/FieldDetail'
+        - type: object
+          properties:
+            reviews:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReviewSummary'
+
+  responses:
+    Unauthorized:
+      description: Autentikasi gagal, token tidak valid atau tidak diberikan
+    Forbidden:
+      description: Akses ditolak, token valid tapi tidak punya hak akses
+    NotFound:
+      description: Resource tidak ditemukan

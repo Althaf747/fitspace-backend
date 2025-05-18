@@ -198,6 +198,7 @@ const getAll = async (venueId) => {
             reviews : {
                 select: {
                     id: true,
+                    rating : true
                 }
             }
         }

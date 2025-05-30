@@ -15,7 +15,7 @@ const register = async (req) => {
         throw new ResponseError(400, "User already exists");
     }
 
-    if (user.password !== user.confirmPassword) {
+    if (user.password !== user.confirm_password) {
         throw new ResponseError(403, "Password does not match");
     }
 
@@ -100,7 +100,7 @@ const changePassword = async (id, req) => {
         throw new ResponseError(403, "User does not exist");
     }
 
-    if (req.body.password !== req.body.confirmPassword) {
+    if (req.body.password !== req.body.confirm_password) {
         throw new ResponseError(403, "Password does not match");
     }
 
@@ -191,14 +191,14 @@ const validateOtp = async (request) => {
 
 const resetPassword = async (request) => {
     const newPassword = request.newPassword
-    const confirmPassword = request.confirmPassword
+    const confirm_password = request.confirm_password
     const email = request.email;
 
-    if (!newPassword || !confirmPassword || !email) {
+    if (!newPassword || !confirm_password || !email) {
         throw new ResponseError(400, "Invalid input");
     }
 
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirm_password) {
         throw new ResponseError(400, "Passwords do not match");
     }
 

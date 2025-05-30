@@ -101,11 +101,11 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /api/reviews/{reviewId}/update:
+  /api/reviews/{review_id}/update:
     patch:
       summary: Update Review
       parameters:
-        - name: reviewId
+        - name: review_id
           in: path
           required: true
           schema:
@@ -137,11 +137,11 @@ paths:
           description: Review tidak ditemukan
           $ref: '#/components/responses/NotFound'
 
-  /api/reviews/{reviewId}/delete:
+  /api/reviews/{review_id}/delete:
     delete:
       summary: Delete Review
       parameters:
-        - name: reviewId
+        - name: review_id
           in: path
           required: true
           schema:

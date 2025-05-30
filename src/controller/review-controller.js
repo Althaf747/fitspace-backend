@@ -37,8 +37,8 @@ const getAllReviews = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     try {
-        const reviewId = parseInt(req.params.reviewId);
-        const result = await reviewService.update(reviewId, req);
+        const review_id = parseInt(req.params.review_id);
+        const result = await reviewService.update(review_id, req);
         res.status(200).json({
             data: result,
         })
@@ -49,8 +49,8 @@ const update = async (req, res, next) => {
 
 const deleteReview = async (req, res, next) => {
     try {
-        const reviewId = parseInt(req.params.reviewId);
-        await reviewService.deleteReview(reviewId,req);
+        const review_id = parseInt(req.params.review_id);
+        await reviewService.deleteReview(review_id,req);
         res.status(200).json({
             message: 'Review deleted successfully.',
         })

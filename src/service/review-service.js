@@ -86,13 +86,13 @@ const getAllReviews = async (req) => {
     }));
 }
 
-const update = async (reviewId ,req) => {
+const update = async (review_id ,req) => {
     const user = req.user
     const data = validate(updateValidation,req.body);
 
     const review = await prismaClient.review.findUnique({
         where: {
-            id: reviewId,
+            id: review_id,
         }
     })
 
@@ -108,7 +108,7 @@ const update = async (reviewId ,req) => {
 
     return prismaClient.review.update({
         where: {
-            id: reviewId,
+            id: review_id,
         }, data : data,
         select: {
             id: true,
@@ -121,12 +121,12 @@ const update = async (reviewId ,req) => {
 
 }
 
-const deleteReview = async (reviewId ,req) => {
+const deleteReview = async (review_id ,req) => {
     const user = req.user
 
     const review = await prismaClient.review.findUnique({
         where: {
-            id: reviewId,
+            id: review_id,
         }
     })
 
@@ -142,7 +142,7 @@ const deleteReview = async (reviewId ,req) => {
 
     await prismaClient.review.delete({
         where: {
-            id: reviewId,
+            id: review_id,
         }
     })
 

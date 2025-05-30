@@ -34,8 +34,8 @@ protectedRouter.delete('/api/:venue_id/fields/:field_id/delete',fieldController.
 protectedRouter.post('/api/:venue_id/fields/:field_id/addReview',reviewController.create)
 protectedRouter.get('/api/:field_id/reviews', reviewController.getReviewsByfield_id);
 protectedRouter.get('/api/reviews', reviewController.getAllReviews);
-protectedRouter.patch('/api/reviews/:reviewId/update', reviewController.update);
-protectedRouter.delete('/api/reviews/:reviewId/delete',reviewController.deleteReview);
+protectedRouter.patch('/api/reviews/:review_id/update', reviewController.update);
+protectedRouter.delete('/api/reviews/:review_id/delete',reviewController.deleteReview);
 
 // Booking Route
 protectedRouter.post('/api/:venue_id/bookings/create',bookingController.create);

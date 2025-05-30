@@ -24,21 +24,21 @@ protectedRouter.patch('/api/venues/update/:id', venueController.update);
 protectedRouter.delete('/api/venues/delete/:id', venueController.deleteVenue);
 
 // Field Route
-protectedRouter.post('/api/:venueId/fields/create',upload.array("files") ,fieldController.create);
+protectedRouter.post('/api/:venue_id/fields/create',upload.array("files") ,fieldController.create);
 protectedRouter.get('/api/venues/fields/:id',fieldController.get);
-protectedRouter.get('/api/:venueId/fields',fieldController.getAll);
-protectedRouter.patch('/api/:venueId/fields/:fieldId/update', upload.array("files"), fieldController.updateField);
-protectedRouter.delete('/api/:venueId/fields/:fieldId/delete',fieldController.deleteField);
+protectedRouter.get('/api/:venue_id/fields',fieldController.getAll);
+protectedRouter.patch('/api/:venue_id/fields/:field_id/update', upload.array("files"), fieldController.updateField);
+protectedRouter.delete('/api/:venue_id/fields/:field_id/delete',fieldController.deleteField);
 
 // Review Route
-protectedRouter.post('/api/:venueId/fields/:fieldId/addReview',reviewController.create)
-protectedRouter.get('/api/:fieldId/reviews', reviewController.getReviewsByFieldId);
+protectedRouter.post('/api/:venue_id/fields/:field_id/addReview',reviewController.create)
+protectedRouter.get('/api/:field_id/reviews', reviewController.getReviewsByfield_id);
 protectedRouter.get('/api/reviews', reviewController.getAllReviews);
 protectedRouter.patch('/api/reviews/:reviewId/update', reviewController.update);
 protectedRouter.delete('/api/reviews/:reviewId/delete',reviewController.deleteReview);
 
 // Booking Route
-protectedRouter.post('/api/:venueId/bookings/create',bookingController.create);
+protectedRouter.post('/api/:venue_id/bookings/create',bookingController.create);
 protectedRouter.get('/api/user/bookings/all', bookingController.getAll);
 protectedRouter.patch('/api/bookings/:bookingId/update', bookingController.update);
 protectedRouter.delete('/api/bookings/:bookingId/delete', bookingController.deleteBooking);

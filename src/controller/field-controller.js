@@ -2,8 +2,8 @@ import fieldService from "../service/field-service.js";
 
 const create = async (req, res, next) => {
     try {
-        const venueId = parseInt(req.params.venueId);
-        const result = await fieldService.create(venueId, req.files,req);
+        const venue_id = parseInt(req.params.venue_id);
+        const result = await fieldService.create(venue_id, req.files,req);
         res.status(202).json({
             data: result
         });
@@ -26,8 +26,8 @@ const get = async (req, res, next) => {
 
 const getAll = async (req, res, next) => {
     try {
-        const venueId = parseInt(req.params.venueId);
-        const result = await fieldService.getAll(venueId);
+        const venue_id = parseInt(req.params.venue_id);
+        const result = await fieldService.getAll(venue_id);
         res.status(200).json({
             data: result
         })
@@ -38,8 +38,8 @@ const getAll = async (req, res, next) => {
 
 const updateField = async (req, res, next) => {
     try {
-        const { venueId, fieldId } = req.params;
-        const result = await fieldService.updateField(req, req.files, Number(venueId), Number(fieldId));
+        const { venue_id, fieldId } = req.params;
+        const result = await fieldService.updateField(req, req.files, Number(venue_id), Number(fieldId));
         res.status(200).json({
             data: result
         });
@@ -51,8 +51,8 @@ const updateField = async (req, res, next) => {
 const deleteField = async (req, res, next) => {
     try {
         const fieldId = parseInt(req.params.fieldId);
-        const venueId = parseInt(req.params.venueId);
-        await fieldService.deleteField(fieldId,venueId,req);
+        const venue_id = parseInt(req.params.venue_id);
+        await fieldService.deleteField(fieldId,venue_id,req);
         res.status(200).json({
             message: 'field deleted'
         })

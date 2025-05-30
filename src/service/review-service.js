@@ -3,12 +3,12 @@ import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import {createValidation, updateValidation} from "../validation/review-validation.js";
 
-const create = async (fieldId, req) => {
+const create = async (field_id, req) => {
     const user = req.user;
     const data = validate(createValidation,req.body);
     const field = await prismaClient.field.findUnique({
         where: {
-            id : fieldId,
+            id : field_id,
         }
     })
     if (!field) {
@@ -17,31 +17,31 @@ const create = async (fieldId, req) => {
 
     return prismaClient.review.create({
         data: {
-            fieldId : fieldId,
-            userId : user.id,
+            field_id : field_id,
+            user_id : user.id,
             comment : data.comment,
             rating : data.rating,
         },select: {
             id: true,
-            fieldId : true,
+            field_id : true,
             rating : true,
             comment : true,
         }
     })
 }
 
-const getReviewsByFieldId = async (fieldId) => {
+const getReviewsByfield_id = async (field_id) => {
     const reviews = await prismaClient.review.findMany({
-        where: { fieldId },
+        where: { field_id },
         select: {
             id: true,
-            userId: true,
+            user_id: true,
             rating: true,
             comment: true,
             user: {
                 select: {
-                    firstName: true,
-                    lastName: true,
+                    first_name: true,
+                    last_name: true,
                 }
             }
         }
@@ -63,13 +63,13 @@ const getAllReviews = async (req) => {
     const reviews = await prismaClient.review.findMany({
         select: {
             id: true,
-            userId: true,
+            user_id: true,
             rating: true,
             comment: true,
             user: {
                 select: {
-                    firstName: true,
-                    lastName: true,
+                    first_name: true,
+                    last_name: true,
                 }
             }
         }
@@ -81,7 +81,7 @@ const getAllReviews = async (req) => {
         id: review.id,
         rating: review.rating,
         comment: review.comment,
-        userId: review.userId,
+        user_id: review.user_id,
         user: review.user
     }));
 }
@@ -100,7 +100,7 @@ const update = async (reviewId ,req) => {
         throw new ResponseError(404, "review not found.");
     }
 
-    if(user.id !== review.userId) {
+    if(user.id !== review.user_id) {
         if ( req.user.role !== "admin" ) {
             throw new ResponseError(403, "access denied for this user.");
         }
@@ -112,7 +112,7 @@ const update = async (reviewId ,req) => {
         }, data : data,
         select: {
             id: true,
-            userId: true,
+            user_id: true,
             rating: true,
             comment: true,
         }
@@ -134,7 +134,7 @@ const deleteReview = async (reviewId ,req) => {
         throw new ResponseError(404, "review not found.");
     }
 
-    if(user.id !== review.userId) {
+    if(user.id !== review.user_id) {
         if ( req.user.role !== "admin" ) {
             throw new ResponseError(403, "access denied for this user.");
         }
@@ -148,4 +148,4 @@ const deleteReview = async (reviewId ,req) => {
 
 }
 
-export default { create, getReviewsByFieldId, getAllReviews, update, deleteReview };
+export default { create, getReviewsByfield_id, getAllReviews, update, deleteReview };

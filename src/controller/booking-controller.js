@@ -2,8 +2,8 @@ import bookingService from "../service/booking-service.js";
 
 const create = async (req,res,next) => {
     try {
-        const venueId = parseInt(req.params.venueId);
-        const result = await bookingService.create(req, venueId);
+        const venue_id = parseInt(req.params.venue_id);
+        const result = await bookingService.create(req, venue_id);
         res.status(200).json({
             data: result,
         })

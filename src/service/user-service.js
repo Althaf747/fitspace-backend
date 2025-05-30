@@ -25,8 +25,8 @@ const register = async (req) => {
         data: {
             email: user.email,
             password: user.password,
-            firstName : user.firstName,
-            lastName : user.lastName,
+            first_name : user.first_name,
+            last_name : user.last_name,
         },
         select: {
             id : true,
@@ -52,7 +52,7 @@ const login = async (req) => {
         throw new ResponseError(401, "Password does not match");
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY );
+    const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET_KEY );
 
     return token;
 }
@@ -61,8 +61,8 @@ const get = async (req) => {
     const user = await prismaClient.user.findUnique({ where: { id: req.user.id }, select: {
             id : true,
             email: true,
-            firstName: true,
-            lastName: true,
+            first_name: true,
+            last_name: true,
         } });
 
     if (!user) {
@@ -83,13 +83,13 @@ const changeUsername = async (id, req) => {
             id: id,
         },
         data :{
-          firstName : req.body.firstName,
-          lastName : req.body.lastName,
+          first_name : req.body.first_name,
+          last_name : req.body.last_name,
         },select : {
             id :true,
             email: true,
-            firstName : true,
-            lastName : true,
+            first_name : true,
+            last_name : true,
         }
     })
 }

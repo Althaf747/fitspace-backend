@@ -8,15 +8,15 @@ const create = async (user, req) => {
     return prismaClient.venue.create({
         data: {
             name: venue.name,
-            phoneNumber: venue.phoneNumber,
+            phone_number: venue.phone_number,
             street: venue.street,
             district: venue.district,
-            cityOrRegency: venue.cityOrRegency,
+            city_or_regency: venue.city_or_regency,
             province: venue.province,
-            postalCode: venue.postalCode,
+            postal_code: venue.postal_code,
             latitude: venue.latitude,
             longitude: venue.longitude,
-            ownerId: user.id,
+            owner_id: user.id,
         }
     })
 }
@@ -42,12 +42,12 @@ const update = async (id,req) => {
         }
     })
     console.log(req.user.id)
-    console.log(venue.ownerId);
+    console.log(venue.owner_id);
     if (!venue) {
         throw new ResponseError(403, "venue not found.");
     }
 
-    if(req.user.id !== venue.ownerId) {
+    if(req.user.id !== venue.owner_id) {
         if ( req.user.role !== "admin" ) {
             throw new ResponseError(403, "access denied for this user.");
         }
@@ -71,7 +71,7 @@ const deleteVenue = async (id,req) => {
         throw new ResponseError(403, "venue not found.");
     }
 
-    if(req.user.id !== venue.ownerId) {
+    if(req.user.id !== venue.owner_id) {
         if ( req.user.role !== "admin" ) {
             throw new ResponseError(403, "access denied for this user.");
         }
@@ -90,20 +90,20 @@ const getAllVenue = async () => {
         select: {
             id: true,
             name : true,
-            phoneNumber: true,
+            phone_number: true,
             street: true,
             district: true,
-            cityOrRegency: true,
+            city_or_regency: true,
             province: true,
-            postalCode: true,
+            postal_code: true,
             latitude: true,
             longitude: true,
             rating: true,
             owner : {
                 select :{
-                    firstName : true,
-                    lastName : true,
-                    createdAt : true,
+                    first_name : true,
+                    last_name : true,
+                    created_at : true,
                 }
             },
             fields : {

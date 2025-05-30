@@ -3,14 +3,14 @@ import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import {createValidation, updateValidation} from "../validation/booking-validation.js";
 
-const create = async (req, venueId) => {
+const create = async (req, venue_id) => {
     const user = req.user;
     const data = validate(createValidation,req.body)
     console.log(data);
 
     const venue = await prismaClient.venue.findUnique({
         where: {
-            id: venueId,
+            id: venue_id,
         }
     })
 
@@ -20,7 +20,7 @@ const create = async (req, venueId) => {
 
     const field = await prismaClient.field.findFirst({
         where: {
-            venueId: venueId,
+            venue_id: venue_id,
             type : data.type,
         }
     })
@@ -66,20 +66,20 @@ const create = async (req, venueId) => {
     return prismaClient.booking.create({
         data : {
             status: "on going",
-            customerId : user.id,
-            scheduleId : fs.scheduleId,
-            fieldId : fs.fieldId
+            customer_id : user.id,
+            schedule_id : fs.schedule_id,
+            field_id : fs.field_id
         },select : {
             id : true,
             status: true,
-            customerId : true,
+            customer_id : true,
             schedule : {
                 select :{
                     date : true,
                     timeSlot : true,
                 }
             },
-            fieldId : true,
+            field_id : true,
         }
     })
 
@@ -89,14 +89,14 @@ const getAll = async (req)  => {
     const user = req.user;
     const bookings = await prismaClient.booking.findMany({
         where: {
-            customerId : user.id
+            customer_id : user.id
         }, select: {
             id : true,
             status : true,
             customer : {
                 select : {
-                    firstName : true,
-                    lastName : true,
+                    first_name : true,
+                    last_name : true,
                 }
             },
             field : {
@@ -133,7 +133,7 @@ const update = async (req, bookingId) => {
         throw new ResponseError(404, "booking not found");
     }
 
-    if(user.id !== review.userId) {
+    if(user.id !== review.user_id) {
         if ( req.user.role !== "admin" ) {
             throw new ResponseError(403, "access denied for this user.");
         }
@@ -149,8 +149,8 @@ const update = async (req, bookingId) => {
 
     const fs = await prismaClient.fieldSchedule.findFirst({
         where: {
-            fieldId : booking.fieldId,
-            scheduleId : booking.scheduleId
+            field_id : booking.field_id,
+            schedule_id : booking.schedule_id
         }
     })
 
@@ -180,7 +180,7 @@ const deleteBooking = async (req, bookingId) => {
         throw new ResponseError(404, "booking not found");
     }
 
-    if(user.id !== review.userId) {
+    if(user.id !== review.user_id) {
         if ( req.user.role !== "admin" ) {
             throw new ResponseError(403, "access denied for this user.");
         }
@@ -188,8 +188,8 @@ const deleteBooking = async (req, bookingId) => {
 
     const fs = await prismaClient.fieldSchedule.findFirst({
         where: {
-            fieldId : booking.fieldId,
-            scheduleId : booking.scheduleId
+            field_id : booking.field_id,
+            schedule_id : booking.schedule_id
         }
     })
 

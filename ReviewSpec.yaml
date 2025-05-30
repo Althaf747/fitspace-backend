@@ -10,7 +10,7 @@ security:
   - bearerAuth: []
 
 paths:
-  /api/{venueId}/fields/{fieldId}/addReview:
+  /api/{venueId}/fields/{field_id}/addReview:
     post:
       summary: Add Review
       parameters:
@@ -20,7 +20,7 @@ paths:
           schema:
             type: integer
           description: ID Venue terkait
-        - name: fieldId
+        - name: field_id
           in: path
           required: true
           schema:
@@ -52,11 +52,11 @@ paths:
           description: Field tidak ditemukan
           $ref: '#/components/responses/NotFound'
 
-  /api/{fieldId}/reviews:
+  /api/{field_id}/reviews:
     get:
       summary: Get Reviews by Field ID
       parameters:
-        - name: fieldId
+        - name: field_id
           in: path
           required: true
           schema:
@@ -205,9 +205,9 @@ components:
       properties:
         id:
           type: integer
-        fieldId:
+        field_id:
           type: integer
-        userId:
+        user_id:
           type: integer
         rating:
           type: integer
@@ -217,9 +217,9 @@ components:
     UserSummary:
       type: object
       properties:
-        firstName:
+        first_name:
           type: string
-        lastName:
+        last_name:
           type: string
 
     ReviewByField:
@@ -239,7 +239,7 @@ components:
       properties:
         id:
           type: integer
-        userId:
+        user_id:
           type: integer
         rating:
           type: integer

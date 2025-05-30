@@ -155,28 +155,28 @@ components:
       type: object
       required:
         - name
-        - phoneNumber
+        - phone_number
         - street
         - district
-        - cityOrRegency
+        - city_or_regency
         - province
-        - postalCode
+        - postal_code
         - latitude
         - longitude
       properties:
         name:
           type: string
-        phoneNumber:
+        phone_number:
           type: string
         street:
           type: string
         district:
           type: string
-        cityOrRegency:
+        city_or_regency:
           type: string
         province:
           type: string
-        postalCode:
+        postal_code:
           type: string
         latitude:
           type: number
@@ -190,17 +190,17 @@ components:
       properties:
         name:
           type: string
-        phoneNumber:
+        phone_number:
           type: string
         street:
           type: string
         district:
           type: string
-        cityOrRegency:
+        city_or_regency:
           type: string
         province:
           type: string
-        postalCode:
+        postal_code:
           type: string
         latitude:
           type: number
@@ -216,17 +216,17 @@ components:
           type: integer
         name:
           type: string
-        phoneNumber:
+        phone_number:
           type: string
         street:
           type: string
         district:
           type: string
-        cityOrRegency:
+        city_or_regency:
           type: string
         province:
           type: string
-        postalCode:
+        postal_code:
           type: string
         latitude:
           type: number
@@ -234,7 +234,7 @@ components:
         longitude:
           type: number
           format: double
-        ownerId:
+        owner_id:
           type: integer
 
     VenueById:
@@ -244,17 +244,17 @@ components:
           type: integer
         name:
           type: string
-        phoneNumber:
+        phone_number:
           type: string
         street:
           type: string
         district:
           type: string
-        cityOrRegency:
+        city_or_regency:
           type: string
         province:
           type: string
-        postalCode:
+        postal_code:
           type: string
         latitude:
           type: number
@@ -262,14 +262,14 @@ components:
         longitude:
           type: number
           format: double
-        ownerId:
+        owner_id:
           type: integer
         rating:
           type: number
-        createdAt:
+        created_at:
           type: string
           format: date-time
-        updatedAt:
+        updated_at:
           type: string
           format: date-time
 
@@ -277,11 +277,11 @@ components:
     Owner:
       type: object
       properties:
-        firstName:
+        first_name:
           type: string
-        lastName:
+        last_name:
           type: string
-        createdAt:
+        created_at:
           type: string
           format: date-time
 

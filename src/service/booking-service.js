@@ -32,7 +32,7 @@ const create = async (req, venue_id) => {
     const schedule = await prismaClient.schedule.findFirst({
         where: {
             date : data.date,
-            timeSlot : data.timeSlot,
+            time_slot : data.time_slot,
         }
     })
 
@@ -76,7 +76,7 @@ const create = async (req, venue_id) => {
             schedule : {
                 select :{
                     date : true,
-                    timeSlot : true,
+                    time_slot : true,
                 }
             },
             field_id : true,
@@ -109,7 +109,7 @@ const getAll = async (req)  => {
                 select : {
                     id : true,
                     date : true,
-                    timeSlot : true,
+                    time_slot : true,
                 }
             }
         }
@@ -121,11 +121,11 @@ const getAll = async (req)  => {
     return bookings;
 }
 
-const update = async (req, bookingId) => {
+const update = async (req, booking_id) => {
     const status = validate(updateValidation,req.body.status);
     const booking = await prismaClient.booking.findUnique({
         where: {
-            id: bookingId,
+            id: booking_id,
         }
     })
 
@@ -141,7 +141,7 @@ const update = async (req, bookingId) => {
 
     await prismaClient.booking.update({
         where: {
-            id: bookingId,
+            id: booking_id,
         },data :{
             status : status,
         }
@@ -167,12 +167,12 @@ const update = async (req, bookingId) => {
 
 }}
 
-const deleteBooking = async (req, bookingId) => {
+const deleteBooking = async (req, booking_id) => {
     const user = req.user;
 
     const booking = await prismaClient.booking.findUnique({
         where: {
-            id: bookingId,
+            id: booking_id,
         }
     })
 
@@ -203,7 +203,7 @@ const deleteBooking = async (req, bookingId) => {
 
     await prismaClient.booking.delete({
         where: {
-            id: bookingId,
+            id: booking_id,
         }
     })
 }

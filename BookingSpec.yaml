@@ -10,11 +10,11 @@ security:
   - bearerAuth: []
 
 paths:
-  /api/{venueId}/bookings/create:
+  /api/{venue_id}/bookings/create:
     post:
       summary: Create Booking
       parameters:
-        - name: venueId
+        - name: venue_id
           in: path
           required: true
           schema:
@@ -63,11 +63,11 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  /api/bookings/{bookingId}/update:
+  /api/bookings/{booking_id}/update:
     patch:
       summary: Update Booking
       parameters:
-        - name: bookingId
+        - name: booking_id
           in: path
           required: true
           schema:
@@ -99,11 +99,11 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/bookings/{bookingId}/delete:
+  /api/bookings/{booking_id}/delete:
     delete:
       summary: Delete Booking
       parameters:
-        - name: bookingId
+        - name: booking_id
           in: path
           required: true
           schema:
@@ -141,7 +141,7 @@ components:
       required:
         - type
         - date
-        - timeSlot
+        - time_slot
       properties:
         type:
           type: string
@@ -150,7 +150,7 @@ components:
           type: string
           format: date
           description: Tanggal booking (YYYY-MM-DD)
-        timeSlot:
+        time_slot:
           type: string
           description: Slot waktu booking (misal':' "09:00-10:00")
 
@@ -169,7 +169,7 @@ components:
         date:
           type: string
           format: date
-        timeSlot:
+        time_slot:
           type: string
 
     ScheduleDetail:
@@ -180,15 +180,15 @@ components:
         date:
           type: string
           format: date
-        timeSlot:
+        time_slot:
           type: string
 
     CustomerSummary:
       type: object
       properties:
-        firstName:
+        first_name:
           type: string
-        lastName:
+        last_name:
           type: string
 
     FieldSummary:
@@ -206,9 +206,9 @@ components:
           type: integer
         status:
           type: string
-        customerId:
+        customer_id:
           type: integer
-        fieldId:
+        field_id:
           type: integer
         schedule:
           $ref: '#/components/schemas/ScheduleSummary'

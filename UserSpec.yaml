@@ -226,20 +226,20 @@ components:
       required:
         - email
         - password
-        - confirmPassword
-        - firstName
-        - lastName
+        - confirm_password
+        - first_name
+        - last_name
       properties:
         email:
           type: string
           format: email
         password:
           type: string
-        confirmPassword:
+        confirm_password:
           type: string
-        firstName:
+        first_name:
           type: string
-        lastName:
+        last_name:
           type: string
 
     LoginRequest:
@@ -272,31 +272,31 @@ components:
             email:
               type: string
               format: email
-            firstName:
+            first_name:
               type: string
-            lastName:
+            last_name:
               type: string
 
     UpdateUsername:
       type: object
       required:
-        - firstName
-        - lastName
+        - first_name
+        - last_name
       properties:
-        firstName:
+        first_name:
           type: string
-        lastName:
+        last_name:
           type: string
 
     ChangePassword:
       type: object
       required:
         - password
-        - confirmPassword
+        - confirm_password
       properties:
         password:
           type: string
-        confirmPassword:
+        confirm_password:
           type: string
 
     ForgotPassword:
@@ -319,7 +319,7 @@ components:
       type: object
       required:
         - newPassword
-        - confirmPassword
+        - confirm_password
         - email
       properties:
         newPassowrd:

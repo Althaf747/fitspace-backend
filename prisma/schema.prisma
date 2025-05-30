@@ -82,7 +82,7 @@ model Gallery {
 model Schedule {
   id             Int          @id @default(autoincrement())
   date           DateTime     @db.Date
-  timeSlot       String          @db.VarChar(255)
+  time_slot       String          @db.VarChar(255)
   created_at      DateTime        @default(now())
   updated_at      DateTime        @default(now()) @updatedAt
   bookings       Booking[]

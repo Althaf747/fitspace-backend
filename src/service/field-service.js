@@ -42,7 +42,7 @@ const createScheduleIfNotExist = async () => {
     });
 
     if (schedulesThisWeek.length === 0) {
-        const timeSlots = [
+        const time_slots = [
             "06:00 - 07:00", "07:00 - 08:00", "08:00 - 09:00", "09:00 - 10:00",
             "10:00 - 11:00", "11:00 - 12:00", "12:00 - 13:00", "13:00 - 14:00",
             "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00", "17:00 - 18:00",
@@ -54,9 +54,9 @@ const createScheduleIfNotExist = async () => {
             const scheduleDate = new Date(startOfWeek);
             scheduleDate.setDate(startOfWeek.getDate() + i);
 
-            const newSchedules = timeSlots.map(timeSlot => ({
+            const newSchedules = time_slots.map(time_slot => ({
                 date: scheduleDate,
-                timeSlot,
+                time_slot,
                 created_at: new Date(),
                 updated_at: new Date()
             }));
@@ -151,7 +151,7 @@ const get = async (id) => {
                         select: {
                             id: true,
                             date: true,
-                            timeSlot: true,
+                            time_slot: true,
 
                         }
                     }
@@ -189,7 +189,7 @@ const getAll = async (venue_id) => {
                         select: {
                             id: true,
                             date: true,
-                            timeSlot: true,
+                            time_slot: true,
 
                         }
                     }

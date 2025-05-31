@@ -1,0 +1,257 @@
+openapi: 3.0.0
+info:
+  title: Review API
+  version: 1.0.0
+  description: Review service API untuk mengelola ulasan lapangan
+servers:
+  - url: https://api.example.com
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/{venueId}/fields/{field_id}/addReview:
+    post:
+      summary: Add Review
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Venue terkait
+        - name: field_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Field yang akan diulas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '200':
+          description: Review berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Review'
+        '400':
+          description: Validasi gagal atau data tidak lengkap
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Field tidak ditemukan
+          $ref: '#/components/responses/NotFound'
+
+  /api/{field_id}/reviews:
+    get:
+      summary: Get Reviews by Field ID
+      parameters:
+        - name: field_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Field
+      responses:
+        '200':
+          description: Daftar ulasan untuk field tertentu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReviewByField'
+        '404':
+          description: Tidak ada ulasan untuk field ini
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/reviews:
+    get:
+      summary: Get All Reviews
+      responses:
+        '200':
+          description: Daftar semua ulasan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReviewAll'
+        '404':
+          description: Tidak ada ulasan ditemukan
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/reviews/{review_id}/update:
+    patch:
+      summary: Update Review
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReviewRequest'
+      responses:
+        '200':
+          description: Data review berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Review'
+        '400':
+          description: Validasi gagal atau data tidak valid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Review tidak ditemukan
+          $ref: '#/components/responses/NotFound'
+
+  /api/reviews/{review_id}/delete:
+    delete:
+      summary: Delete Review
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID Review
+      responses:
+        '200':
+          description: Review berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Review deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Review tidak ditemukan
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT dikirim di header Authorization sebagai `Bearer {token}`
+
+  schemas:
+    CreateReviewRequest:
+      type: object
+      required:
+        - comment
+        - rating
+      properties:
+        comment:
+          type: string
+          description: Isi ulasan
+        rating:
+          type: integer
+          format: int32
+          description: Nilai rating (misal 1–5)
+
+    UpdateReviewRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          description: Ulasan baru (opsional)
+        rating:
+          type: integer
+          format: int32
+          description: Rating baru (opsional)
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        field_id:
+          type: integer
+        user_id:
+          type: integer
+        rating:
+          type: integer
+        comment:
+          type: string
+
+    UserSummary:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+
+    ReviewByField:
+      type: object
+      properties:
+        id:
+          type: integer
+        rating:
+          type: integer
+        comment:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserSummary'
+
+    ReviewAll:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        rating:
+          type: integer
+        comment:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserSummary'
+
+  responses:
+    Unauthorized:
+      description: Autentikasi gagal, token tidak valid atau tidak diberikan
+    Forbidden:
+      description: Akses ditolak, token valid tapi tidak punya hak akses
+    NotFound:
+      description: Resource tidak ditemukan

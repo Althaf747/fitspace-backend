@@ -15,7 +15,7 @@ const register = async (req) => {
         throw new ResponseError(400, "User already exists");
     }
 
-    if (user.password !== user.confirmPassword) {
+    if (user.password !== user.confirm_password) {
         throw new ResponseError(403, "Password does not match");
     }
 
@@ -25,8 +25,8 @@ const register = async (req) => {
         data: {
             email: user.email,
             password: user.password,
-            firstName : user.firstName,
-            lastName : user.lastName,
+            first_name : user.first_name,
+            last_name : user.last_name,
         },
         select: {
             id : true,
@@ -52,7 +52,7 @@ const login = async (req) => {
         throw new ResponseError(401, "Password does not match");
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET_KEY );
 
     return token;
 }
@@ -61,8 +61,8 @@ const get = async (req) => {
     const user = await prismaClient.user.findUnique({ where: { id: req.user.id }, select: {
             id : true,
             email: true,
-            firstName: true,
-            lastName: true,
+            first_name: true,
+            last_name: true,
         } });
 
     if (!user) {
@@ -83,13 +83,13 @@ const changeUsername = async (id, req) => {
             id: id,
         },
         data :{
-          firstName : req.body.firstName,
-          lastName : req.body.lastName,
+          first_name : req.body.first_name,
+          last_name : req.body.last_name,
         },select : {
             id :true,
             email: true,
-            firstName : true,
-            lastName : true,
+            first_name : true,
+            last_name : true,
         }
     })
 }
@@ -100,7 +100,7 @@ const changePassword = async (id, req) => {
         throw new ResponseError(403, "User does not exist");
     }
 
-    if (req.body.password !== req.body.confirmPassword) {
+    if (req.body.password !== req.body.confirm_password) {
         throw new ResponseError(403, "Password does not match");
     }
 
@@ -191,14 +191,14 @@ const validateOtp = async (request) => {
 
 const resetPassword = async (request) => {
     const newPassword = request.newPassword
-    const confirmPassword = request.confirmPassword
+    const confirm_password = request.confirm_password
     const email = request.email;
 
-    if (!newPassword || !confirmPassword || !email) {
+    if (!newPassword || !confirm_password || !email) {
         throw new ResponseError(400, "Invalid input");
     }
 
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirm_password) {
         throw new ResponseError(400, "Passwords do not match");
     }
 

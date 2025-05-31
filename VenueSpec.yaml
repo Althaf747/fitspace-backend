@@ -1,0 +1,316 @@
+openapi: 3.0.0
+info:
+  title: Venue API
+  version: 1.0.0
+  description: venue service API
+servers:
+  - url: https://api.example.com
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/venues/createVenue:
+    post:
+      summary: Create Venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVenueRequest'
+      responses:
+        '200':
+          description: Venue berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Venue'
+        '400':
+          description: Validasi gagal
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/venues/{id}:
+    get:
+      summary: Get Venue by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID venue
+      responses:
+        '200':
+          description: Data venue berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VenueById'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/venues:
+    get:
+      summary: Get All Venues
+      responses:
+        '200':
+          description: Daftar semua venue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VenueList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/venues/update/{id}:
+    patch:
+      summary: Update Venue
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVenueRequest'
+      responses:
+        '200':
+          description: Data venue berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Venue'
+        '400':
+          description: Validasi gagal
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/venues/delete/{id}:
+    delete:
+      summary: Delete Venue
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID venue
+      responses:
+        '200':
+          description: Venue berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Venue deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT harus dikirim di header Authorization dengan format 'Bearer {token}'
+
+  schemas:
+    CreateVenueRequest:
+      type: object
+      required:
+        - name
+        - phone_number
+        - street
+        - district
+        - city_or_regency
+        - province
+        - postal_code
+        - latitude
+        - longitude
+      properties:
+        name:
+          type: string
+        phone_number:
+          type: string
+        street:
+          type: string
+        district:
+          type: string
+        city_or_regency:
+          type: string
+        province:
+          type: string
+        postal_code:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+
+    UpdateVenueRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone_number:
+          type: string
+        street:
+          type: string
+        district:
+          type: string
+        city_or_regency:
+          type: string
+        province:
+          type: string
+        postal_code:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+
+    Venue:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone_number:
+          type: string
+        street:
+          type: string
+        district:
+          type: string
+        city_or_regency:
+          type: string
+        province:
+          type: string
+        postal_code:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        owner_id:
+          type: integer
+
+    VenueById:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        phone_number:
+          type: string
+        street:
+          type: string
+        district:
+          type: string
+        city_or_regency:
+          type: string
+        province:
+          type: string
+        postal_code:
+          type: string
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        owner_id:
+          type: integer
+        rating:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+
+    Owner:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Field:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        price:
+          type: number
+
+    VenueList:
+      allOf:
+        - $ref: '#/components/schemas/Venue'
+        - type: object
+          properties:
+            owner:
+              $ref: '#/components/schemas/Owner'
+            fields:
+              type: array
+              items:
+                $ref: '#/components/schemas/Field'
+
+  responses:
+    Unauthorized:
+      description: Autentikasi gagal, token tidak valid atau tidak diberikan
+    Forbidden:
+      description: Akses ditolak, token valid tapi tidak punya hak akses
+    NotFound:
+      description: Resource tidak ditemukan

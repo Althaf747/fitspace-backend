@@ -19,14 +19,14 @@ datasource db {
 model User {
   id                  Int       @id @default(autoincrement())
   email               String    @unique
-  firstName           String    @db.VarChar(100)
-  lastName            String?   @db.VarChar(100)
+  first_name           String    @db.VarChar(100)
+  last_name            String?   @db.VarChar(100)
   password            String    @db.VarChar(100)
   role                String    @default("user")
   otp                 Int?   @unique
-  otpExpiredAt        DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @default(now()) @updatedAt
+  otp_expired_at        DateTime?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @default(now()) @updatedAt
   venues              Venue[]
   reviews             Review[]
   bookings            Booking[]
@@ -35,92 +35,92 @@ model User {
 // Venue model
 model Venue {
   id            Int   @id @default(autoincrement())
-  ownerId       Int
+  owner_id       Int
   name          String   @db.VarChar(100)
-  phoneNumber   String   @db.VarChar(100)
+  phone_number   String   @db.VarChar(100)
   street        String   @db.VarChar(100)
   district      String   @db.VarChar(100)
-  cityOrRegency String   @db.VarChar(100)
+  city_or_regency String   @db.VarChar(100)
   province      String   @db.VarChar(100)
-  postalCode    String   @db.VarChar(100)
+  postal_code    String   @db.VarChar(100)
   latitude      Float
   longitude     Float
   rating        Float    @default(0.0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now()) @updatedAt
-  owner         User     @relation(fields: [ownerId], references: [id])
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+  owner         User     @relation(fields: [owner_id], references: [id])
   fields        Field[]
 }
 
 // Field model
 model Field {
   id             Int          @id @default(autoincrement())
-  venueId        Int
+  venue_id        Int
   price          Float
   type           String          @db.VarChar(100)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @default(now()) @updatedAt
-  venue          Venue           @relation(fields: [venueId], references: [id])
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @default(now()) @updatedAt
+  venue          Venue           @relation(fields: [venue_id], references: [id])
   gallery        Gallery[]
   reviews        Review[]
   bookings       Booking[]
-  fieldSchedules FieldSchedule[]
+  field_schedules FieldSchedule[]
 }
 
 // Gallery model
 model Gallery {
   id          Int   @id @default(autoincrement())
-  fieldId     Int
+  field_id     Int
   photoUrl    String   @db.VarChar(100)
   description String?  @db.VarChar(255)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-  field       Field    @relation(fields: [fieldId], references: [id])
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now()) @updatedAt
+  field       Field    @relation(fields: [field_id], references: [id])
 }
 
 // Schedule model
 model Schedule {
   id             Int          @id @default(autoincrement())
   date           DateTime     @db.Date
-  timeSlot       String          @db.VarChar(255)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @default(now()) @updatedAt
+  time_slot       String          @db.VarChar(255)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @default(now()) @updatedAt
   bookings       Booking[]
-  fieldSchedules FieldSchedule[]
+  field_schedules FieldSchedule[]
 }
 
 // Review model
 model Review {
   id        Int   @id @default(autoincrement())
-  fieldId   Int
-  userId    Int
+  field_id   Int
+  user_id    Int
   rating    Int
   comment   String?  @db.VarChar(255)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  field     Field    @relation(fields: [fieldId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  field     Field    @relation(fields: [field_id], references: [id])
+  user      User     @relation(fields: [user_id], references: [id])
 }
 
 // Booking model
 model Booking {
   id         Int   @id @default(autoincrement())
   status     String   @db.VarChar(255)
-  customerId Int
-  scheduleId Int
-  createdAt  DateTime @default(now())
-  customer   User     @relation(fields: [customerId], references: [id])
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  field      Field?   @relation(fields: [fieldId], references: [id])
-  fieldId    Int?
+  customer_id Int
+  schedule_id Int
+  created_at  DateTime @default(now())
+  customer   User     @relation(fields: [customer_id], references: [id])
+  schedule   Schedule @relation(fields: [schedule_id], references: [id])
+  field      Field?   @relation(fields: [field_id], references: [id])
+  field_id    Int?
 }
 
 // FieldSchedule model
 model FieldSchedule {
   id         Int   @id @default(autoincrement())
   status     String   @default("available")
-  fieldId    Int
-  scheduleId Int
-  field      Field    @relation(fields: [fieldId], references: [id])
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  field_id    Int
+  schedule_id Int
+  field      Field    @relation(fields: [field_id], references: [id])
+  schedule   Schedule @relation(fields: [schedule_id], references: [id])
 }

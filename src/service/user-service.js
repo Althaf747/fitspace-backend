@@ -212,8 +212,7 @@ const resetPassword = async (request) => {
             data: {
                 password: hashedPassword
             },select : {
-                id : true,
-                username: true,
+                id : true
             }
         });
     } catch (error) {

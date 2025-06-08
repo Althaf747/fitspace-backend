@@ -2,6 +2,7 @@ import { validate } from "../validation/validation.js";
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import {createValidation, updateValidation} from "../validation/booking-validation.js";
+import {logger} from "../application/logging.js";
 
 const create = async (req, venue_id) => {
     const user = req.user;
@@ -65,7 +66,7 @@ const create = async (req, venue_id) => {
 
     return prismaClient.booking.create({
         data : {
-            status: "on going",
+            status: "ongoing",
             customer_id : user.id,
             schedule_id : fs.schedule_id,
             field_id : fs.field_id
@@ -103,6 +104,12 @@ const getAll = async (req)  => {
                 select : {
                     id: true,
                     type : true,
+                    price : true,
+                    venue : {
+                        select : {
+                            name : true,
+                        }
+                    }
                 }
             },
             schedule :{
@@ -122,7 +129,9 @@ const getAll = async (req)  => {
 }
 
 const update = async (req, booking_id) => {
-    const status = validate(updateValidation,req.body.status);
+    const data = validate(updateValidation,req.body);
+    const status = data.status;
+
     const booking = await prismaClient.booking.findUnique({
         where: {
             id: booking_id,
@@ -133,11 +142,11 @@ const update = async (req, booking_id) => {
         throw new ResponseError(404, "booking not found");
     }
 
-    if(user.id !== review.user_id) {
-        if ( req.user.role !== "admin" ) {
-            throw new ResponseError(403, "access denied for this user.");
-        }
-    }
+    // if(user.id !== review.user_id) {
+    //     if ( req.user.role !== "admin" ) {
+    //         throw new ResponseError(403, "access denied for this user.");
+    //     }
+    // }
 
     await prismaClient.booking.update({
         where: {
@@ -154,9 +163,7 @@ const update = async (req, booking_id) => {
         }
     })
 
-    console.log(fs)
-
-    if (status === "cancelled" || status === "finished") {
+    if (status === "canceled" || status === "finished") {
         await prismaClient.fieldSchedule.update({
             where: {
                 id : fs.id

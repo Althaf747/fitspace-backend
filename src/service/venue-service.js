@@ -2,6 +2,7 @@ import { validate } from "../validation/validation.js";
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import {createValidation, updateValidation} from "../validation/venue-validation.js";
+import {logger} from "../application/logging.js";
 
 const create = async (user, req) => {
     const venue = validate(createValidation,req);
@@ -41,8 +42,7 @@ const update = async (id,req) => {
             id: id,
         }
     })
-    console.log(req.user.id)
-    console.log(venue.owner_id);
+
     if (!venue) {
         throw new ResponseError(403, "venue not found.");
     }
@@ -101,6 +101,7 @@ const getAllVenue = async () => {
             rating: true,
             owner : {
                 select :{
+                    id : true,
                     first_name : true,
                     last_name : true,
                     created_at : true,
@@ -111,6 +112,60 @@ const getAllVenue = async () => {
                     id: true,
                     type : true,
                     price : true,
+                    gallery : true,
+                }
+            }
+        }
+    })
+    if (!venues) {
+        throw new ResponseError(403, "venue not found.");
+    }
+    return venues;
+}
+
+const getAllVenuesByOwner = async (id) => {
+    const venues = await prismaClient.venue.findMany({
+        where: {
+            owner_id: id,
+        },
+        select: {
+            id: true,
+            name : true,
+            phone_number: true,
+            street: true,
+            district: true,
+            city_or_regency: true,
+            province: true,
+            postal_code: true,
+            latitude: true,
+            longitude: true,
+            rating: true,
+            owner : {
+                select :{
+                    id : true,
+                    first_name : true,
+                    last_name : true,
+                    created_at : true,
+                }
+            },
+            fields : {
+                select : {
+                    id: true,
+                    type : true,
+                    price : true,
+                    gallery : true,
+                    field_schedules: {
+                        select: {
+                            id: true,
+                            status: true,
+                            schedule: {
+                                select: {
+                                    time_slot: true,
+                                    date: true
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -122,4 +177,4 @@ const getAllVenue = async () => {
 }
 
 
-export default { create ,get , update, deleteVenue, getAllVenue };
+export default { create ,get , update, deleteVenue, getAllVenue, getAllVenuesByOwner };

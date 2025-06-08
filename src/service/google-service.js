@@ -3,6 +3,7 @@ import {prismaClient} from '../application/database.js';
 import {OAuth2Client} from 'google-auth-library';
 import userService from "./user-service.js";
 import jwt from "jsonwebtoken";
+import {logger} from "../application/logging.js";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -48,9 +49,9 @@ const findOrCreateUser = async (token, email,name) => {
     const req = {
         "email": email,
         "password": token.substring(0,100),
-        "confirmPassword": token.substring(0,100),
-        "firstName": firstName,
-        "lastName": lastName,
+        "confirm_password": token.substring(0,100),
+        "first_name": firstName,
+        "last_name": lastName,
     }
 
     if (!user) {

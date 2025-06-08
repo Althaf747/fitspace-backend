@@ -1,4 +1,5 @@
 import venueService from "../service/venue-service.js";
+import {logger} from "../application/logging.js";
 
 const createVenue = async (req, res, next) => {
     try {
@@ -59,4 +60,16 @@ const getAllVenues = async (req, res, next) => {
     }
 }
 
-export default {createVenue,get, update, deleteVenue, getAllVenues};
+const getAllVenuesByOwner = async (req, res, next) => {
+    try {
+        const id = parseInt(req.user.id);
+        const result = await venueService.getAllVenuesByOwner(id);
+        res.status(200).json({
+            data: result,
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
+export default {createVenue,get, update, deleteVenue, getAllVenues, getAllVenuesByOwner};

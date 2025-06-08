@@ -3,7 +3,7 @@ import joi  from "joi";
 const createValidation = joi.object({
     type: joi.string().required(),
     date: joi.date().required(),
-    timeSlot: joi.string().required(),
+    time_slot: joi.string().required(),
 })
 
 const updateValidation = joi.object({

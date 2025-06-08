@@ -3,6 +3,7 @@ import {ResponseError} from "../error/response-error.js";
 import fs from "fs";
 import {fileURLToPath} from 'url';
 import path from "path";
+import {logger} from "../application/logging.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,11 @@ const saveFileLocally = (file) => {
 const createScheduleIfNotExist = async () => {
     const today = new Date();
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+
+    let dayOfWeek = today.getDay();
+    let adjustedDay = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+
+    startOfWeek.setDate(today.getDate() - adjustedDay);
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
 
@@ -66,8 +71,56 @@ const createScheduleIfNotExist = async () => {
     }
 };
 
+const createFieldSchedules = async (fieldId) => {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+
+    let dayOfWeek = today.getDay();
+    let adjustedDay = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+
+    startOfWeek.setDate(today.getDate() - adjustedDay - 1);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+    let schedulesThisWeek = await prismaClient.schedule.findMany({
+        where: {
+            date: {
+                gte: startOfWeek,
+                lte: endOfWeek
+            }
+        }
+    });
+
+    if (schedulesThisWeek.length === 0) {
+        await createScheduleIfNotExist();
+        schedulesThisWeek = await prismaClient.schedule.findMany({
+            where: {
+                date: {
+                    gte: startOfWeek,
+                    lte: endOfWeek
+                }
+            }
+        });
+    }
+
+    logger.info(`SCHW: ${schedulesThisWeek.length}` );
+
+    return await Promise.all(schedulesThisWeek.map(schedule =>
+        prismaClient.fieldSchedule.create({
+            data: {
+                field_id: fieldId,
+                schedule_id: schedule.id,
+                status: "Available"
+            }
+        })
+    ));
+}
+
 const create = async (venue_id,files,req) => {
-    const data = req.body
+    logger.info("DATA: ", req.body);
+    const data = JSON.parse(req.body.field);
+
+
     let gallery;
     const venue = await prismaClient.venue.findUnique({
         where: {
@@ -99,38 +152,7 @@ const create = async (venue_id,files,req) => {
         }));
     }
 
-    let schedulesThisWeek = await prismaClient.schedule.findMany({
-        where: {
-            date: {
-                gte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay())),
-                lte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 7))
-            }
-        }
-    });
-
-    if (schedulesThisWeek.length === 0) {
-        await createScheduleIfNotExist();
-        schedulesThisWeek = await prismaClient.schedule.findMany({
-            where: {
-                date: {
-                    gte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay())),
-                    lte: new Date(new Date().setDate(new Date().getDate() - new Date().getDay() + 7))
-                }
-            }
-        });
-    }
-
-    console.log(schedulesThisWeek);
-
-    const field_schedules = await Promise.all(schedulesThisWeek.map(schedule =>
-        prismaClient.fieldSchedule.create({
-            data: {
-                field_id: field.id,
-                schedule_id: schedule.id,
-                status: "Available"
-            }
-        })
-    ));
+    const field_schedules = await createFieldSchedules(field.id);
 
     return {field, gallery, field_schedules};
 
@@ -144,6 +166,11 @@ const get = async (id) => {
             venue_id: true,
             price: true,
             type: true,
+            gallery: {
+              select: {
+                  photoUrl: true
+              }
+            },
             field_schedules: {  // Include schedules
                 select: {
                     status: true,
@@ -163,6 +190,8 @@ const get = async (id) => {
         throw new ResponseError(404,'field not found');
     }
 
+    await createFieldSchedules(id)
+
     return field
 }
 
@@ -175,6 +204,15 @@ const getAll = async (venue_id) => {
     if (!venue) {
         throw new ResponseError(404,'venue not found');
     }
+
+    if (venue.fields && Array.isArray(venue.fields)) {
+        venue.fields.map(async (field) => {
+            await createFieldSchedules(field.id);
+        });
+    } else {
+        console.error('venue.fields is undefined or not an array');
+    }
+
     return prismaClient.field.findMany({
         where: { venue_id : venue_id },
         select: {
@@ -182,6 +220,11 @@ const getAll = async (venue_id) => {
             venue_id: true,
             price: true,
             type: true,
+            gallery: {
+                select: {
+                    photoUrl: true
+                }
+            },
             field_schedules: {
                 select: {
                     status: true,
@@ -190,7 +233,6 @@ const getAll = async (venue_id) => {
                             id: true,
                             date: true,
                             time_slot: true,
-
                         }
                     }
                 }
@@ -198,64 +240,65 @@ const getAll = async (venue_id) => {
             reviews : {
                 select: {
                     id: true,
-                    rating : true
+                    field_id: true,
+                    rating : true,
+                    comment: true,
+                    user : true,
                 }
             }
         }
     })
 }
 
-const updateField = async (req,files, venue_id, field_id) => {
-    const removedFiles = req.body.removedFiles;
+const updateField = async (req, files, venue_id, field_id) => {
+    const data = JSON.parse(req.body.field);
+    const removedImages = data.removedImages;
     const user = req.user;
-    const venue = await prismaClient.venue.findUnique({ where: {
-        id: venue_id }
-    });
+
+    // Verifikasi Venue
+    const venue = await prismaClient.venue.findUnique({ where: { id: venue_id } });
     if (!venue) throw new ResponseError(404, "Venue not found");
     if (venue.owner_id !== user.id) {
         throw new ResponseError(403, "You are not the owner of this venue");
     }
 
-    const field = await prismaClient.field.findUnique({ where: {
-        id: field_id }
+    // Verifikasi Field
+    const field = await prismaClient.field.findUnique({
+        where: { id: field_id },
+        select: { field_schedules: true }
     });
     if (!field) {
         throw new ResponseError(404, "Field not found");
     }
 
     const existingfield_schedules = field.field_schedules;
-    if (req.field_schedules && req.field_schedules.length > 0) {
-        for (let i = 0; i < existingfield_schedules.length; i++) {
-            const fieldSchedule = existingfield_schedules[i];
-            const newStatus = req.field_schedules[i].status;
-            if (newStatus) {
-                fieldSchedule.status = newStatus;
-            }
-        }
-        await prismaClient.fieldSchedule.updateMany({
-            data: existingfield_schedules
-        });
+
+    // Update field_schedules
+    if (data.field_schedules && data.field_schedules.length > 0) {
+        // Update field_schedules satu per satu
+        await Promise.all(data.field_schedules.map(async (scheduleData, index) => {
+            const fieldSchedule = existingfield_schedules[index];
+            await prismaClient.fieldSchedule.update({
+                where: {
+                    id: fieldSchedule.id,  // Pastikan untuk menggunakan ID yang benar
+                },
+                data: {
+                    status: scheduleData.status,  // Mengupdate status
+                }
+            });
+        }));
     }
 
+    logger.info("HEREEEE");
+    logger.info(`RF: ${removedImages}`);
 
-    if (removedFiles.length > 0) {
-        const deleteFilePromises = removedFiles.map(async (file) => {
+    if (removedImages.length > 0) {
+        const deleteFilePromises = removedImages.map(async (file) => {
             const filePath = path.join(__dirname, '../uploads', path.basename(file)); // Assuming uploads directory and filename
-            const photo = await prismaClient.gallery.findFirst({
-                where: {
-                    photoUrl: file
-                }
-            })
-
-            console.log(file);
-            console.log(removedFiles)
-            console.log("/uploads/1742781345914-Screenshot 2025-03-02 093651.png")
-            console.log(photo)
+            const photo = await prismaClient.gallery.findFirst({ where: { photoUrl: file } });
 
             const deleteFromDbPromise = prismaClient.gallery.delete({
-                where: {
-                    id: photo.id,
-                },
+                where: { id: photo.id },
             });
 
             const deleteFromLocalPromise = new Promise((resolve, reject) => {
@@ -276,10 +319,11 @@ const updateField = async (req,files, venue_id, field_id) => {
         await Promise.all(deleteFilePromises);
     }
 
+    // Logika untuk menyimpan gambar baru jika ada
     if (files && files.length > 0) {
         await Promise.all(files.map(async (file) => {
             const fileName = saveFileLocally(file);
-            return  prismaClient.gallery.create({
+            return prismaClient.gallery.create({
                 data: {
                     photoUrl: `/uploads/${fileName}`,
                     field_id: field.id
@@ -288,21 +332,27 @@ const updateField = async (req,files, venue_id, field_id) => {
         }));
     }
 
-    if (req.price) {
-        field.price = req.price;
-    }
+    // Update field (harga dan jenis) jika ada perubahan
+    const fieldData = {
+        price: data.price || field.price,
+        type: data.type || field.type,
+    };
 
-    if (req.type) {
-        field.type = req.type;
+    // Pastikan field_id disertakan untuk operasi update
+    if (field_id) {
+        await prismaClient.field.update({
+            where: { id: field_id }, // Gunakan field_id yang valid
+            data: fieldData,
+        });
+    } else {
+        throw new ResponseError(400, "Field ID is missing");
     }
-
-    await prismaClient.field.update({
-        where: { id: field.id },
-        data: field
-    });
 
     return field;
 };
+
+
+
 
 const deleteField = async (id, venue_id, req) => {
     console.log(id)

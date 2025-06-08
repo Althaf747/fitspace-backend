@@ -6,6 +6,7 @@ import 'dotenv/config'
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import {emailValidation, loginValidation, registerUserValidation} from "../validation/user-validation.js";
+import {logger} from "../application/logging.js";
 
 const register = async (req) => {
     const user = validate(registerUserValidation, req);
@@ -100,11 +101,19 @@ const changePassword = async (id, req) => {
         throw new ResponseError(403, "User does not exist");
     }
 
-    if (req.body.password !== req.body.confirm_password) {
+    logger.info("B");
+    const isMatch = await bcrypt.compare(req.body.current_password, user.password);
+    logger.info("A");
+
+    if (!isMatch) {
+        throw new ResponseError(403, "Password is wrong");
+    }
+
+    if (req.body.new_password !== req.body.confirmation_password) {
         throw new ResponseError(403, "Password does not match");
     }
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.new_password, 10);
 
     return prismaClient.user.update({
         where: {

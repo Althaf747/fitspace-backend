@@ -3,8 +3,12 @@ Content-Type: application/json
 
 {
   "email": "test@example.com",
-  "password": "12345678"
+  "password": "Test1234*"
 }
+
+###
+GET http://localhost:8080/api/users/current
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwiaWF0IjoxNzQ4NzkzNTU1fQ.dr3IZWDb4mlAJv29wvmNcVPjF3EdvfnAXhxHBlAqR4g
 
 ###
 POST http://localhost:8080/api/users/register
@@ -17,3 +21,24 @@ Content-Type: application/json
   "firstName": "test",
   "lastName": "1234"
 }
+
+###
+POST http://localhost:8080/api/7/fields/create
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3NDkzNDI2NjR9.d5WjiFPpNmHNQBf0SPElU50wHHVTJ0gNXa_NxBvgWyQ
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="field"
+
+{
+    "type": "Futsal",
+    "price": 120000
+}
+
+--boundary
+Content-Disposition: form-data; name="files"; filename="dummy-image.jpg"
+Content-Type: image/jpeg
+
+@/path/to/dummy-image.jpg
+
+--boundary--

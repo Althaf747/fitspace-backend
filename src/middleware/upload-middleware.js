@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 const storage = multer.memoryStorage(); // Store file in memory before processing
 
 const fileFilter = (req, file, cb) => {
-    const allowedMimeTypes = ["image/jpeg", "image/png"];
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (allowedMimeTypes.includes(file.mimetype)) {
         cb(null, true);
     } else {

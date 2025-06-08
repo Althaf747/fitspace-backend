@@ -20,6 +20,7 @@ protectedRouter.patch('/api/users/changeUsername/:id', userController.changeUser
 protectedRouter.post('/api/venues/createVenue', venueController.createVenue);
 protectedRouter.get('/api/venues/:id', venueController.get);
 protectedRouter.get('/api/venues', venueController.getAllVenues);
+protectedRouter.get('/api/venues-owner', venueController.getAllVenuesByOwner);
 protectedRouter.patch('/api/venues/update/:id', venueController.update);
 protectedRouter.delete('/api/venues/delete/:id', venueController.deleteVenue);
 

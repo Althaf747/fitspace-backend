@@ -17,110 +17,110 @@ datasource db {
 
 // User model
 model User {
-  id                  Int       @id @default(autoincrement())
-  email               String    @unique
-  first_name           String    @db.VarChar(100)
-  last_name            String?   @db.VarChar(100)
-  password            String    @db.VarChar(100)
-  role                String    @default("user")
-  otp                 Int?   @unique
-  otp_expired_at        DateTime?
-  created_at           DateTime  @default(now())
-  updated_at           DateTime  @default(now()) @updatedAt
-  venues              Venue[]
-  reviews             Review[]
-  bookings            Booking[]
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  first_name     String    @db.VarChar(100)
+  last_name      String?   @db.VarChar(100)
+  password       String    @db.VarChar(100)
+  role           String    @default("user")
+  otp            Int?      @unique
+  otp_expired_at DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @default(now()) @updatedAt
+  venues         Venue[]
+  reviews        Review[]
+  bookings       Booking[]
 }
 
 // Venue model
 model Venue {
-  id            Int   @id @default(autoincrement())
-  owner_id       Int
-  name          String   @db.VarChar(100)
-  phone_number   String   @db.VarChar(100)
-  street        String   @db.VarChar(100)
-  district      String   @db.VarChar(100)
+  id              Int      @id @default(autoincrement())
+  owner_id        Int
+  name            String   @db.VarChar(100)
+  phone_number    String   @db.VarChar(100)
+  street          String   @db.VarChar(100)
+  district        String   @db.VarChar(100)
   city_or_regency String   @db.VarChar(100)
-  province      String   @db.VarChar(100)
-  postal_code    String   @db.VarChar(100)
-  latitude      Float
-  longitude     Float
-  rating        Float    @default(0.0)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @default(now()) @updatedAt
-  owner         User     @relation(fields: [owner_id], references: [id])
-  fields        Field[]
+  province        String   @db.VarChar(100)
+  postal_code     String   @db.VarChar(100)
+  latitude        Float
+  longitude       Float
+  rating          Float    @default(0.0)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now()) @updatedAt
+  owner           User     @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  fields          Field[]
 }
 
 // Field model
 model Field {
-  id             Int          @id @default(autoincrement())
+  id              Int             @id @default(autoincrement())
   venue_id        Int
-  price          Float
-  type           String          @db.VarChar(100)
+  price           Float
+  type            String          @db.VarChar(100)
   created_at      DateTime        @default(now())
   updated_at      DateTime        @default(now()) @updatedAt
-  venue          Venue           @relation(fields: [venue_id], references: [id])
-  gallery        Gallery[]
-  reviews        Review[]
-  bookings       Booking[]
+  venue           Venue           @relation(fields: [venue_id], references: [id], onDelete: Cascade)
+  gallery         Gallery[]
+  reviews         Review[]
+  bookings        Booking[]
   field_schedules FieldSchedule[]
 }
 
 // Gallery model
 model Gallery {
-  id          Int   @id @default(autoincrement())
-  field_id     Int
+  id          Int      @id @default(autoincrement())
+  field_id    Int
   photoUrl    String   @db.VarChar(100)
   description String?  @db.VarChar(255)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now()) @updatedAt
-  field       Field    @relation(fields: [field_id], references: [id])
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  field       Field    @relation(fields: [field_id], references: [id], onDelete: Cascade)
 }
 
 // Schedule model
 model Schedule {
-  id             Int          @id @default(autoincrement())
-  date           DateTime     @db.Date
+  id              Int             @id @default(autoincrement())
+  date            DateTime        @db.Date
   time_slot       String          @db.VarChar(255)
   created_at      DateTime        @default(now())
   updated_at      DateTime        @default(now()) @updatedAt
-  bookings       Booking[]
+  bookings        Booking[]
   field_schedules FieldSchedule[]
 }
 
 // Review model
 model Review {
-  id        Int   @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   field_id   Int
   user_id    Int
-  rating    Int
-  comment   String?  @db.VarChar(255)
+  rating     Int
+  comment    String?  @db.VarChar(255)
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
-  field     Field    @relation(fields: [field_id], references: [id])
-  user      User     @relation(fields: [user_id], references: [id])
+  field      Field    @relation(fields: [field_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 // Booking model
 model Booking {
-  id         Int   @id @default(autoincrement())
-  status     String   @db.VarChar(255)
+  id          Int      @id @default(autoincrement())
+  status      String   @db.VarChar(255)
   customer_id Int
   schedule_id Int
   created_at  DateTime @default(now())
-  customer   User     @relation(fields: [customer_id], references: [id])
-  schedule   Schedule @relation(fields: [schedule_id], references: [id])
-  field      Field?   @relation(fields: [field_id], references: [id])
+  customer    User     @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
+  field       Field?   @relation(fields: [field_id], references: [id], onDelete: Cascade)
   field_id    Int?
 }
 
 // FieldSchedule model
 model FieldSchedule {
-  id         Int   @id @default(autoincrement())
-  status     String   @default("available")
+  id          Int      @id @default(autoincrement())
+  status      String   @default("available")
   field_id    Int
   schedule_id Int
-  field      Field    @relation(fields: [field_id], references: [id])
-  schedule   Schedule @relation(fields: [schedule_id], references: [id])
+  field       Field    @relation(fields: [field_id], references: [id], onDelete: Cascade)
+  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
 }

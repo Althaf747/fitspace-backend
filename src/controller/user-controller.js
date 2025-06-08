@@ -1,4 +1,5 @@
 import userService from "../service/user-service.js";
+import {logger} from "../application/logging.js";
 
 const register = async (req, res, next) => {
     try {

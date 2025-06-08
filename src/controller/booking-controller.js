@@ -25,7 +25,7 @@ const getAll = async (req,res,next) => {
 
 const update = async (req,res,next) => {
     try {
-        const bookingId = parseInt(req.params.bookingId);
+        const bookingId = parseInt(req.params.booking_id);
         await bookingService.update(req,bookingId)
         res.status(200).json({
             message: "Booking updated successfully",

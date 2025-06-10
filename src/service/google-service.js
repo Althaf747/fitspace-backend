@@ -56,13 +56,13 @@ const findOrCreateUser = async (token, email,name) => {
 
     if (!user) {
         const user = userService.register(req);
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
         return {
             "user": user,
             "token": token,
         }
     } else {
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
         return {
             "user": user,

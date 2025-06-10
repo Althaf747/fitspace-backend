@@ -9,7 +9,11 @@ import {emailValidation, loginValidation, registerUserValidation} from "../valid
 import {logger} from "../application/logging.js";
 
 const register = async (req) => {
+    logger.info(`REQ: ${req}`);
+
     const user = validate(registerUserValidation, req);
+
+    logger.info(`USER: ${user}`);
 
     const existingUser = await prismaClient.user.findUnique({ where: { email: user.email } });
     if (existingUser) {

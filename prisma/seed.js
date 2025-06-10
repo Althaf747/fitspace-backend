@@ -32,6 +32,7 @@ async function main() {
                     role: 'user',
                     otp: 123453 + index,
                     otp_expired_at: new Date('2025-06-01 00:00:00'),
+                    created_at: new Date('2025-06-01 00:00:00'),
                 },
             })
         )
@@ -47,8 +48,8 @@ async function main() {
                     phone_number: `123-456-789${index}`,
                     street: `Jl. Progresif No. ${index + 1}`,
                     district: `District ${index + 1}`,
-                    city_or_regency: `City ${index + 1}`,
-                    province: `Province ${index + 1}`,
+                    city_or_regency: ["Kota Bandung", "Kabupated Bandung", "Kabupated Bandung Barat"][Math.floor(Math.random() * 2)],
+                    province: `Jawa Barat`,
                     postal_code: `1234${index}`,
                     latitude: 40.7128 + index * 0.01,
                     longitude: -74.0060 - index * 0.01,
@@ -58,30 +59,50 @@ async function main() {
         )
     );
 
-    // Create 5 dummy fields for each venue
-    const fields = await Promise.all(
+    // Create 10 dummy fields for each venue
+    const promiseFields = await Promise.all(
         venues.map((venue, index) =>
-            prisma.field.create({
-                data: {
-                    venue_id: venue.id,
-                    price: 500000 + index * 100000,
-                    type: ["Futsal", "Basketball", "Badminton", "Volleyball"][Math.floor(Math.random() * 3)],
-                },
-            })
+            Promise.all([
+                prisma.field.create({
+                    data: {
+                        venue_id: venue.id,
+                        price: 500000 + index * 100000,
+                        type: ["Futsal", "Basketball", "Badminton", "Volleyball"][Math.floor(Math.random() * 4)],  // Memastikan 4 tipe (index 0-3)
+                    },
+                }),
+                prisma.field.create({
+                    data: {
+                        venue_id: venue.id,
+                        price: 500000 + index * 100000 + 50000, // Harga berbeda untuk field kedua
+                        type: ["Futsal", "Basketball", "Badminton", "Volleyball"][Math.floor(Math.random() * 4)],
+                    },
+                })
+            ])
         )
     );
 
-    // Insert 5 dummy gallery photos for each field
+
+    // Insert 10 dummy gallery photos for each field
     await Promise.all(
-        fields.map((field, index) =>
-            prisma.gallery.create({
-                data: {
-                    field_id: field.id,
-                    photoUrl: `/uploads/1749347070653-6y4os2mr81u91.png`,
-                    description: `Main football field ${index + 1}`,
-                },
-            })
-        )
+        promiseFields.map((fields) => Promise.all(
+            fields.map((field, index) => Promise.all([
+                logger.info(`FIELD ${JSON.stringify(field.id)}`),
+                prisma.gallery.create({
+                    data: {
+                        field_id: field.id,
+                        photoUrl: [`/uploads/1749347070653-6y4os2mr81u91.png`, '/uploads/1749347322258-153ba53016b838cc927598957958.jpg', '/uploads/1749378953872-wyndon_stadium__galar_league__by_willdinomaster55_ddq2l5d-pre.jpg'][Math.floor(Math.random() * 3)],
+                        description: `Main football field ${index + 1}`,
+                    },
+                }),
+                prisma.gallery.create({
+                    data: {
+                        field_id: field.id,
+                        photoUrl: [`/uploads/1749347070653-6y4os2mr81u91.png`, '/uploads/1749347322258-153ba53016b838cc927598957958.jpg', '/uploads/1749378953872-wyndon_stadium__galar_league__by_willdinomaster55_ddq2l5d-pre.jpg'][Math.floor(Math.random() * 3)],
+                        description: `Main football field ${index + 1}`,
+                    },
+                }),
+            ]))
+        ))
     );
 
     const createScheduleIfNotExist = async () => {
@@ -163,47 +184,53 @@ async function main() {
     logger.info(`SCHW: ${schedulesThisWeek.length}` );
 
     await Promise.all(
-        fields.map((field, index) =>
-            Promise.all(schedulesThisWeek.map(schedule => {
-                    logger.info(`INDEX: ${index}`)
-                    return prismaClient.fieldSchedule.create({
-                        data: {
-                            field_id: field.id,
-                            schedule_id: schedule.id,
-                            status: "Available"
-                        }
-                    })
-                }
-            ))
-        )
+        promiseFields.map((fields) => Promise.all(
+            fields.map((field, index) =>
+                Promise.all(schedulesThisWeek.map(schedule => {
+                        logger.info(`INDEX: ${index}`)
+                        return prismaClient.fieldSchedule.create({
+                            data: {
+                                field_id: field.id,
+                                schedule_id: schedule.id,
+                                status: "Available"
+                            }
+                        })
+                    }
+                ))
+            )
+        ))
     );
 
     // Insert 5 dummy reviews for the fields
     await Promise.all(
-        fields.map((field, index) =>
-            prisma.review.create({
-                data: {
-                    field_id: field.id,
-                    user_id: users[index].id,
-                    rating: 1 + index,
-                    comment: `Great field ${index + 1}, very spacious and well-maintained!`,
-                },
-            })
-        )
+        promiseFields.map((fields) => Promise.all(
+            fields.map((field, index) =>
+                prisma.review.create({
+                    data: {
+                        field_id: field.id,
+                        user_id: users[index].id,
+                        rating: 1 + index,
+                        comment: `Great field ${index + 1}, very spacious and well-maintained!`,
+                    },
+                })
+            )
+        ))
     );
 
     // Insert 5 dummy bookings for the fields
     await Promise.all(
-        fields.map((field, index) =>
-            prisma.booking.create({
-                data: {
-                    status: 'confirmed',
-                    customer_id: users[index].id,
-                    schedule_id: schedulesThisWeek[index].id,
-                    field_id: field.id,
-                },
-            })
-        )
+        promiseFields.map((fields) => Promise.all(
+            fields.map((field, index) =>
+                prisma.booking.create({
+                    data: {
+                        status: 'confirmed',
+                        customer_id: users[index].id,
+                        schedule_id: schedulesThisWeek[index].id,
+                        field_id: field.id,
+                    },
+                })
+            )
+        ))
     );
 
     console.log('5 sets of dummy data seeded successfully!');

@@ -11,8 +11,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dir = __dirname.replace('src\\application', 'src');
 
-logger.info(`Updated DIR: ${dir}`);
-
 export const web = express();
 web.use(express.static(dir));
 web.use(cors({

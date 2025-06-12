@@ -1,8 +1,10 @@
 import bookingService from "../service/booking-service.js";
+import {logger} from "../application/logging.js";
 
 const create = async (req,res,next) => {
     try {
         const venue_id = parseInt(req.params.venue_id);
+        logger.info(`TEST: ${JSON.stringify(req.body)}`);
         const result = await bookingService.create(req, venue_id);
         res.status(200).json({
             data: result,

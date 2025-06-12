@@ -101,19 +101,21 @@ const createFieldSchedules = async (fieldId) => {
                 }
             }
         });
+
+        logger.info(`SCHW: ${schedulesThisWeek.length}` );
+
+        return await Promise.all(schedulesThisWeek.map(schedule =>
+            prismaClient.fieldSchedule.create({
+                data: {
+                    field_id: fieldId,
+                    schedule_id: schedule.id,
+                    status: "Available"
+                }
+            })
+        ));
     }
 
-    logger.info(`SCHW: ${schedulesThisWeek.length}` );
-
-    return await Promise.all(schedulesThisWeek.map(schedule =>
-        prismaClient.fieldSchedule.create({
-            data: {
-                field_id: fieldId,
-                schedule_id: schedule.id,
-                status: "Available"
-            }
-        })
-    ));
+    return null;
 }
 
 const create = async (venue_id,files,req) => {
@@ -166,6 +168,15 @@ const get = async (id) => {
             venue_id: true,
             price: true,
             type: true,
+            reviews : {
+                select: {
+                    id: true,
+                    field_id: true,
+                    rating : true,
+                    comment: true,
+                    user : true,
+                }
+            },
             gallery: {
               select: {
                   photoUrl: true

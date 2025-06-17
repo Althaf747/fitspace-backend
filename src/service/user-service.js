@@ -105,7 +105,7 @@ const changePassword = async (id, req) => {
         throw new ResponseError(403, "User does not exist");
     }
 
-    logger.info("B");
+    logger.info(`B ${req.body.current_password}`);
     const isMatch = await bcrypt.compare(req.body.current_password, user.password);
     logger.info("A");
 

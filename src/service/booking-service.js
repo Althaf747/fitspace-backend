@@ -105,9 +105,15 @@ const getAll = async (req)  => {
                     id: true,
                     type : true,
                     price : true,
+                    gallery : {
+                        select: {
+                            photoUrl: true
+                        }
+                    },
                     venue : {
                         select : {
                             name : true,
+                            city_or_regency : true
                         }
                     }
                 }

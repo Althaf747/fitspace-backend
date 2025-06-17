@@ -78,9 +78,11 @@ const createFieldSchedules = async (fieldId) => {
     let dayOfWeek = today.getDay();
     let adjustedDay = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
 
-    startOfWeek.setDate(today.getDate() - adjustedDay - 1);
+    startOfWeek.setDate(today.getDate() - adjustedDay);
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 7);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    logger.info(`S: ${startOfWeek} E: ${endOfWeek}`)
 
     let schedulesThisWeek = await prismaClient.schedule.findMany({
         where: {
@@ -90,6 +92,8 @@ const createFieldSchedules = async (fieldId) => {
             }
         }
     });
+
+    logger.info(`STWWW: ${schedulesThisWeek.length}`);
 
     if (schedulesThisWeek.length === 0) {
         await createScheduleIfNotExist();

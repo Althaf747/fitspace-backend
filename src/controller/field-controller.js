@@ -2,8 +2,6 @@ import fieldService from "../service/field-service.js";
 import {logger} from "../application/logging.js";
 
 const create = async (req, res, next) => {
-    logger.info("HEREEEE");
-    logger.info(req.params.venue_id);
     try {
         const venue_id = parseInt(req.params.venue_id);
         const result = await fieldService.create(venue_id, req.files,req);
@@ -55,6 +53,8 @@ const deleteField = async (req, res, next) => {
     try {
         const field_id = parseInt(req.params.field_id);
         const venue_id = parseInt(req.params.venue_id);
+        logger.info("HEREEEE");
+
         await fieldService.deleteField(field_id,venue_id,req);
         res.status(200).json({
             message: 'field deleted'

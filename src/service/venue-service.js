@@ -26,6 +26,35 @@ const get = async (id) => {
     const venue = prismaClient.venue.findUnique({
         where: {
             id: id,
+        },
+        select: {
+            id: true,
+            name : true,
+            phone_number: true,
+            street: true,
+            district: true,
+            city_or_regency: true,
+            province: true,
+            postal_code: true,
+            latitude: true,
+            longitude: true,
+            rating: true,
+            owner : {
+                select :{
+                    id : true,
+                    first_name : true,
+                    last_name : true,
+                    created_at : true,
+                }
+            },
+            fields : {
+                select : {
+                    id: true,
+                    type : true,
+                    price : true,
+                    gallery : true,
+                }
+            }
         }
     })
     if (!venue) {

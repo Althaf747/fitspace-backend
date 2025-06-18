@@ -126,13 +126,13 @@ const create = async (venue_id,files,req) => {
     logger.info("DATA: ", req.body);
     const data = JSON.parse(req.body.field);
 
-
     let gallery;
     const venue = await prismaClient.venue.findUnique({
         where: {
             id: venue_id
         }
     })
+
     if (!venue) {
         throw new ResponseError(404,'venue not found');
     }
@@ -370,7 +370,6 @@ const updateField = async (req, files, venue_id, field_id) => {
 
 
 const deleteField = async (id, venue_id, req) => {
-    console.log(id)
     const field = await prismaClient.field.findUnique({
         where: { id },
         include: { gallery: true, field_schedules: true } // Include related data
@@ -385,6 +384,8 @@ const deleteField = async (id, venue_id, req) => {
             id: venue_id
         }
     })
+
+
     if(req.user.id !== venue.owner_id) {
         if ( req.user.role !== "admin" ) {
             throw new ResponseError(403, "access denied for this user.");

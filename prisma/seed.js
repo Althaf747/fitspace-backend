@@ -7,6 +7,7 @@ const prisma = new PrismaClient();
 
 async function main() {
     const password = await bcrypt.hash('Test1234*', 10); // Ensure password is hashed before using it
+    const adminPassword = await bcrypt.hash('Admin1234*', 10);
 
     const user = await prisma.user.create({
         data: {
@@ -20,9 +21,21 @@ async function main() {
         },
     });
 
+    const admin = await prisma.user.create({
+        data: {
+            email: 'admin@example.com',
+            first_name: 'admin',
+            last_name: '1234',
+            password: adminPassword,  // Use the hashed password here
+            role: 'admin',
+            otp: 123450,
+            otp_expired_at: new Date('2025-06-01 00:00:00'),
+        },
+    });
+
     // Create 5 dummy users
     const users = await Promise.all(
-        Array.from({ length: 5 }).map((_, index) =>
+        Array.from({ length: 12 }).map((_, index) =>
             prisma.user.create({
                 data: {
                     email: `john.doe${index + 1}@example.com`,
@@ -38,7 +51,11 @@ async function main() {
         )
     );
 
-    // Create 5 dummy venues for each user
+    const jakartaLat = -6.2088;
+    const jakartaLon = 106.8456;
+    const bandungLat = -6.9147;
+    const bandungLon = 107.6098;
+
     const venues = await Promise.all(
         users.map((user, index) =>
             prisma.venue.create({
@@ -48,16 +65,23 @@ async function main() {
                     phone_number: `123-456-789${index}`,
                     street: `Jl. Progresif No. ${index + 1}`,
                     district: `District ${index + 1}`,
-                    city_or_regency: ["Kota Bandung", "Kabupated Bandung", "Kabupated Bandung Barat"][Math.floor(Math.random() * 2)],
+                    city_or_regency: ["Kota Bandung", "Kabupaten Bandung", "Kabupaten Bandung Barat"][Math.floor(Math.random() * 3)],
                     province: `Jawa Barat`,
                     postal_code: `1234${index}`,
-                    latitude: 40.7128 + index * 0.01,
-                    longitude: -74.0060 - index * 0.01,
+                    latitude:
+                        Math.random() < 0.5
+                            ? jakartaLat + Math.random() * 0.05 // Small variation within Jakarta
+                            : bandungLat + Math.random() * 0.05, // Small variation within Bandung
+                    longitude:
+                        Math.random() < 0.5
+                            ? jakartaLon + Math.random() * 0.05 // Small variation within Jakarta
+                            : bandungLon + Math.random() * 0.05, // Small variation within Bandung
                     rating: 4.5,
                 },
             })
         )
     );
+
 
     // Create 10 dummy fields for each venue
     const promiseFields = await Promise.all(
@@ -201,7 +225,6 @@ async function main() {
         ))
     );
 
-    // Insert 5 dummy reviews for the fields
     await Promise.all(
         promiseFields.map((fields) => Promise.all(
             fields.map((field, index) =>
@@ -209,7 +232,7 @@ async function main() {
                     data: {
                         field_id: field.id,
                         user_id: users[index].id,
-                        rating: 1 + index,
+                        rating: Math.floor(Math.random() * 6),
                         comment: `Great field ${index + 1}, very spacious and well-maintained!`,
                     },
                 })
@@ -217,13 +240,12 @@ async function main() {
         ))
     );
 
-    // Insert 5 dummy bookings for the fields
     await Promise.all(
         promiseFields.map((fields) => Promise.all(
             fields.map((field, index) =>
                 prisma.booking.create({
                     data: {
-                        status: 'confirmed',
+                        status: 'ongoing',
                         customer_id: users[index].id,
                         schedule_id: schedulesThisWeek[index].id,
                         field_id: field.id,
@@ -233,7 +255,20 @@ async function main() {
         ))
     );
 
-    console.log('5 sets of dummy data seeded successfully!');
+    await Promise.all(
+        promiseFields.map((fields) => Promise.all(
+            fields.map((field, index) =>
+                prisma.booking.create({
+                    data: {
+                        status: 'ongoing',
+                        customer_id: user.id,
+                        schedule_id: schedulesThisWeek[index].id,
+                        field_id: field.id,
+                    },
+                })
+            )
+        ))
+    );
 }
 
 main()

@@ -1,4 +1,4 @@
-POST http://server.fitspace.com/
+POST http://localhost:8080/api/users/login
 Content-Type: application/json
 
 {
@@ -45,3 +45,18 @@ Content-Type: image/jpeg
 
 ###
 POST http://localhost:8080/api/users/google
+
+###
+POST http://localhost:5000/recommendations
+Content-Type: application/json
+
+{
+  "user_id": 1,
+  "user_lat": -6.208898748739306,
+  "user_lon": 106.7742668929873,
+  "top_n": 5
+}
+
+###
+GET http://localhost:8080/api/venues-ai
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3NTAzNjgwMzR9.87beqk4J2S0ubzPkDe1U3Vk_mxx7gVCTSLI49RoGuuE

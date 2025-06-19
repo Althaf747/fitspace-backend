@@ -72,4 +72,15 @@ const getAllVenuesByOwner = async (req, res, next) => {
     }
 }
 
-export default {createVenue,get, update, deleteVenue, getAllVenues, getAllVenuesByOwner};
+const getVenuesAI = async (req, res, next) => {
+    try {
+        const result = await venueService.getVenuesAI(req);
+        res.status(200).json({
+            data: result,
+        })
+    }catch (e){
+        next(e);
+    }
+}
+
+export default {createVenue,get, update, deleteVenue, getAllVenues, getAllVenuesByOwner, getVenuesAI};

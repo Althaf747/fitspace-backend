@@ -228,5 +228,20 @@ const getAllVenuesByOwner = async (id) => {
     return venues;
 }
 
+const getVenuesAI = async (req) => {
+    return prismaClient.venue.findMany({
+        include: {
+            fields: {
+                include: {
+                    field_schedules: true,
+                    gallery: true,
+                    bookings: true // Include bookings related to fields
+                }
+            },
+        }
+    });
 
-export default { create ,get , update, deleteVenue, getAllVenue, getAllVenuesByOwner };
+}
+
+
+export default { create ,get , update, deleteVenue, getAllVenue, getAllVenuesByOwner, getVenuesAI };

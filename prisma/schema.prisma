@@ -48,7 +48,7 @@ model Venue {
   rating          Float    @default(0.0)
   created_at      DateTime @default(now())
   updated_at      DateTime @default(now()) @updatedAt
-  owner           User     @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+  owner           User     @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   fields          Field[]
 }
 
@@ -60,7 +60,7 @@ model Field {
   type            String          @db.VarChar(100)
   created_at      DateTime        @default(now())
   updated_at      DateTime        @default(now()) @updatedAt
-  venue           Venue           @relation(fields: [venue_id], references: [id], onDelete: Cascade)
+  venue           Venue           @relation(fields: [venue_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   gallery         Gallery[]
   reviews         Review[]
   bookings        Booking[]
@@ -75,7 +75,7 @@ model Gallery {
   description String?  @db.VarChar(255)
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now()) @updatedAt
-  field       Field    @relation(fields: [field_id], references: [id], onDelete: Cascade)
+  field       Field    @relation(fields: [field_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // Schedule model
@@ -98,8 +98,8 @@ model Review {
   comment    String?  @db.VarChar(255)
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
-  field      Field    @relation(fields: [field_id], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  field      Field    @relation(fields: [field_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 // Booking model
@@ -109,9 +109,9 @@ model Booking {
   customer_id Int
   schedule_id Int
   created_at  DateTime @default(now())
-  customer    User     @relation(fields: [customer_id], references: [id], onDelete: Cascade)
-  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
-  field       Field?   @relation(fields: [field_id], references: [id], onDelete: Cascade)
+  customer    User     @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  field       Field?   @relation(fields: [field_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   field_id    Int?
 }
 
@@ -121,6 +121,6 @@ model FieldSchedule {
   status      String   @default("available")
   field_id    Int
   schedule_id Int
-  field       Field    @relation(fields: [field_id], references: [id], onDelete: Cascade)
-  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
+  field       Field    @relation(fields: [field_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

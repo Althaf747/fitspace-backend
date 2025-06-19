@@ -71,7 +71,7 @@ const createScheduleIfNotExist = async () => {
     }
 };
 
-const createFieldSchedules = async (fieldId) => {
+const createFieldSchedules = async (fieldId, sign) => {
     const today = new Date();
     const startOfWeek = new Date(today);
 
@@ -108,6 +108,20 @@ const createFieldSchedules = async (fieldId) => {
 
         logger.info(`SCHW: ${schedulesThisWeek.length}` );
 
+        if (sign === 'get') {
+            return await Promise.all(schedulesThisWeek.map(schedule =>
+                prismaClient.fieldSchedule.create({
+                    data: {
+                        field_id: fieldId,
+                        schedule_id: schedule.id,
+                        status: "Available"
+                    }
+                })
+            ));
+        }
+    }
+
+    if (sign === 'create') {
         return await Promise.all(schedulesThisWeek.map(schedule =>
             prismaClient.fieldSchedule.create({
                 data: {
@@ -158,7 +172,7 @@ const create = async (venue_id,files,req) => {
         }));
     }
 
-    const field_schedules = await createFieldSchedules(field.id);
+    const field_schedules = await createFieldSchedules(field.id, 'create');
 
     return {field, gallery, field_schedules};
 
@@ -183,11 +197,13 @@ const get = async (id) => {
             },
             gallery: {
               select: {
+                  id: true,
                   photoUrl: true
               }
             },
             field_schedules: {  // Include schedules
                 select: {
+                    id: true,
                     status: true,
                     schedule: {
                         select: {
@@ -205,7 +221,7 @@ const get = async (id) => {
         throw new ResponseError(404,'field not found');
     }
 
-    await createFieldSchedules(id)
+    await createFieldSchedules(id, 'get')
 
     return field
 }
@@ -222,7 +238,7 @@ const getAll = async (venue_id) => {
 
     if (venue.fields && Array.isArray(venue.fields)) {
         venue.fields.map(async (field) => {
-            await createFieldSchedules(field.id);
+            await createFieldSchedules(field.id, 'get');
         });
     } else {
         console.error('venue.fields is undefined or not an array');
@@ -237,12 +253,15 @@ const getAll = async (venue_id) => {
             type: true,
             gallery: {
                 select: {
+                    id: true,
                     photoUrl: true
                 }
             },
             field_schedules: {
                 select: {
+                    id: true,
                     status: true,
+                    field_id: true,
                     schedule: {
                         select: {
                             id: true,
@@ -270,6 +289,8 @@ const updateField = async (req, files, venue_id, field_id) => {
     const removedImages = data.removedImages;
     const user = req.user;
 
+    logger.info(`PHO: ${JSON.stringify(files)}`);
+
     // Verifikasi Venue
     const venue = await prismaClient.venue.findUnique({ where: { id: venue_id } });
     if (!venue) throw new ResponseError(404, "Venue not found");
@@ -292,10 +313,9 @@ const updateField = async (req, files, venue_id, field_id) => {
     if (data.field_schedules && data.field_schedules.length > 0) {
         // Update field_schedules satu per satu
         await Promise.all(data.field_schedules.map(async (scheduleData, index) => {
-            const fieldSchedule = existingfield_schedules[index];
             await prismaClient.fieldSchedule.update({
                 where: {
-                    id: fieldSchedule.id,  // Pastikan untuk menggunakan ID yang benar
+                    id: scheduleData.id,  // Pastikan untuk menggunakan ID yang benar
                 },
                 data: {
                     status: scheduleData.status,  // Mengupdate status
@@ -341,7 +361,7 @@ const updateField = async (req, files, venue_id, field_id) => {
             return prismaClient.gallery.create({
                 data: {
                     photoUrl: `/uploads/${fileName}`,
-                    field_id: field.id
+                    field_id: field_id
                 }
             });
         }));

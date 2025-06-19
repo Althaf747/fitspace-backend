@@ -106,11 +106,34 @@ const deleteVenue = async (id,req) => {
         }
     }
 
+    await prismaClient.field.deleteMany({
+        where: {
+            venue_id: id,
+        },
+    });
+
+    await prismaClient.booking.deleteMany({
+        where: {
+            field: {
+                venue_id: id,
+            }
+        }
+    });
+
+    await prismaClient.fieldSchedule.deleteMany({
+        where: {
+            field: {
+                venue_id: id,
+            }
+        }
+    });
+
+    // Now delete the venue
     return prismaClient.venue.delete({
         where: {
             id: id,
         }
-    })
+    });
 
 }
 

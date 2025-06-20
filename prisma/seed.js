@@ -180,9 +180,9 @@ async function main() {
     let dayOfWeek = today.getDay();
     let adjustedDay = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
 
-    startOfWeek.setDate(today.getDate() - adjustedDay - 1);
+    startOfWeek.setDate(today.getDate() - adjustedDay);
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 7);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
 
     let schedulesThisWeek = await prismaClient.schedule.findMany({
         where: {

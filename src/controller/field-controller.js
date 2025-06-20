@@ -37,6 +37,17 @@ const getAll = async (req, res, next) => {
     }
 }
 
+const allFields = async (req, res, next) => {
+    try {
+        const result = await fieldService.allFields(req);
+        res.status(200).json({
+            data: result
+        })
+    }catch (error) {
+        next(error);
+    }
+}
+
 const updateField = async (req, res, next) => {
     try {
         const { venue_id, field_id } = req.params;
@@ -65,4 +76,4 @@ const deleteField = async (req, res, next) => {
 }
 
 
-export default { create, get, getAll, updateField, deleteField };
+export default { create, get, getAll, allFields, updateField, deleteField };

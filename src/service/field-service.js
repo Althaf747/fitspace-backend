@@ -284,6 +284,46 @@ const getAll = async (venue_id) => {
     })
 }
 
+const allFields = async (req) => {
+    return prismaClient.field.findMany({
+        select: {
+            id: true,
+            venue_id: true,
+            price: true,
+            type: true,
+            gallery: {
+                select: {
+                    id: true,
+                    photoUrl: true
+                }
+            },
+            field_schedules: {
+                select: {
+                    id: true,
+                    status: true,
+                    field_id: true,
+                    schedule: {
+                        select: {
+                            id: true,
+                            date: true,
+                            time_slot: true,
+                        }
+                    }
+                }
+            },
+            reviews : {
+                select: {
+                    id: true,
+                    field_id: true,
+                    rating : true,
+                    comment: true,
+                    user : true,
+                }
+            }
+        }
+    })
+}
+
 const updateField = async (req, files, venue_id, field_id) => {
     const data = JSON.parse(req.body.field);
     const removedImages = data.removedImages;
@@ -445,4 +485,4 @@ const deleteField = async (id, venue_id, req) => {
 
 }
 
-export default { create,get, getAll, updateField, deleteField };
+export default { create,get, getAll, allFields, updateField, deleteField };

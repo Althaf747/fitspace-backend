@@ -94,6 +94,7 @@ const getAll = async (req)  => {
         }, select: {
             id : true,
             status : true,
+            created_at: true,
             customer : {
                 select : {
                     first_name : true,

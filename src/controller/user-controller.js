@@ -34,6 +34,17 @@ const get = async (req, res, next) => {
     }
 }
 
+const getAll = async (req, res, next) => {
+    try {
+        const result = await userService.getAll(req);
+        res.status(200).json({
+            data: result,
+        })
+    }catch (error) {
+        next(error);
+    }
+}
+
 const logout = async (req, res, next) => {
     try {
         res.status(200).json({
@@ -106,4 +117,4 @@ const validateOtp = async (req, res, next) => {
     }
 }
 
-export default {register, login, get, logout, changeUsername, changePassword, forgotPassword, resetPassword, validateOtp};
+export default {register, login, get, getAll, logout, changeUsername, changePassword, forgotPassword, resetPassword, validateOtp};

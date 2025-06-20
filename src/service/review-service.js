@@ -66,6 +66,7 @@ const getAllReviews = async (req) => {
             user_id: true,
             rating: true,
             comment: true,
+            field_id: true,
             user: {
                 select: {
                     first_name: true,

@@ -11,7 +11,10 @@ GET http://localhost:8080/api/users/current
 Authorization: Bearer eyJ1c2VySWQiOjcsImlhdCI6MTc0OTQzNDcyMCwiZXhwIjoxNzQ5NDM4MzIwfQ.P0hfjvwL0trrfqgYrXUqqWwl4vkXpKsOHpbTs0OQm0Q
 
 ###
-POST http://localhost:8080/api/users/register
+POST http://localhost:8080/api/users/registereyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3NTAzNzgwOTl9.AvMJ2OOfVWy89FbiNztjHqcFJvHtLNqAy-2DYD9v4B8"
+}
+Response file saved.
+> 2025
 Content-Type: application/json
 
 {
@@ -47,7 +50,7 @@ Content-Type: image/jpeg
 POST http://localhost:8080/api/users/google
 
 ###
-POST http://localhost:5000/recommendations
+POST http://192.168.237.45:5000/recommendations
 Content-Type: application/json
 
 {
@@ -59,4 +62,4 @@ Content-Type: application/json
 
 ###
 GET http://localhost:8080/api/venues-ai
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3NTAzNjgwMzR9.87beqk4J2S0ubzPkDe1U3Vk_mxx7gVCTSLI49RoGuuE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpYXQiOjE3NTAzNzgwOTl9.AvMJ2OOfVWy89FbiNztjHqcFJvHtLNqAy-2DYD9v4B8

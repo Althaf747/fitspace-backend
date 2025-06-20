@@ -12,6 +12,7 @@ protectedRouter.use(authMiddleware);
 
 // User Route
 protectedRouter.get('/api/users/current', userController.get);
+protectedRouter.get('/api/users', userController.getAll);
 protectedRouter.delete('/api/users/logout', userController.logout);
 protectedRouter.patch('/api/users/changePassword/:id', userController.changePassword);
 protectedRouter.patch('/api/users/changeUsername/:id', userController.changeUsername);
@@ -29,6 +30,7 @@ protectedRouter.delete('/api/venues/delete/:id', venueController.deleteVenue);
 protectedRouter.post('/api/:venue_id/fields/create',upload.array("files") ,fieldController.create);
 protectedRouter.get('/api/venues/fields/:id',fieldController.get);
 protectedRouter.get('/api/:venue_id/fields',fieldController.getAll);
+protectedRouter.get('/api/fields',fieldController.allFields);
 protectedRouter.patch('/api/:venue_id/fields/:field_id/update', upload.array("files"), fieldController.updateField);
 protectedRouter.delete('/api/:venue_id/fields/:field_id/delete',fieldController.deleteField);
 

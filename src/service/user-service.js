@@ -66,6 +66,7 @@ const get = async (req) => {
     const user = await prismaClient.user.findUnique({ where: { id: req.user.id }, select: {
             id : true,
             email: true,
+            role: true,
             first_name: true,
             last_name: true,
         } });
@@ -76,6 +77,18 @@ const get = async (req) => {
 
     return user;
 }
+
+const getAll = async (req) => {
+    return prismaClient.user.findMany({
+        select: {
+            id: true,
+            email: true,
+            role: true,
+            first_name: true,
+            last_name: true,
+        }
+    });
+};
 
 const changeUsername = async (id, req) => {
     const user = await prismaClient.user.findUnique({ where: { id: id } });
@@ -234,4 +247,4 @@ const resetPassword = async (request) => {
 }
 
 
-export default { register, login, get, changePassword, changeUsername , forgotPassword, validateOtp, resetPassword};
+export default { register, login, get, getAll, changePassword, changeUsername , forgotPassword, validateOtp, resetPassword};
